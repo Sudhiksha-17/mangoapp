@@ -15,7 +15,7 @@ class DisplayFarms extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
+              MaterialPageRoute(builder: (context) => LoginPage()),
             );
           },
         ),
@@ -31,8 +31,7 @@ class DisplayFarms extends StatelessWidget {
                   // Navigate to the AddFarms2Page when the add icon is clicked
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const AddFarmsPage()),
+                    MaterialPageRoute(builder: (context) => AddFarmsPage()),
                   );
                 },
                 child: Container(

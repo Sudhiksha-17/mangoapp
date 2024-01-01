@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'main.dart';
 import 'otp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({Key? key});
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController fullNameController = TextEditingController();
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    TextEditingController phoneNumberController = TextEditingController();
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -61,13 +68,18 @@ class SignUpPage extends StatelessWidget {
                   ),
 
                   // Full Name text and text field
-                  _buildTextFieldWithLabel('Full Name'),
+                  _buildTextFieldWithLabel('Full Name', fullNameController),
 
                   // Email text and text field
-                  _buildTextFieldWithLabel('Email'),
+                  _buildTextFieldWithLabel('Email', emailController),
 
                   // Mobile Number text and text field
-                  _buildTextFieldWithLabel('Mobile Number'),
+                  _buildTextFieldWithLabel(
+                      'Mobile Number', phoneNumberController),
+
+                  // Password text and text field
+                  _buildTextFieldWithLabel('Password', passwordController,
+                      isObscureText: true),
 
                   // Terms & Conditions text
                   const Padding(
@@ -81,15 +93,38 @@ class SignUpPage extends StatelessWidget {
                     ),
                   ),
 
-                  // Continue button
+                  // Continue button with Firebase authentication
                   ElevatedButton(
-                    onPressed: () {
-                      // Navigate to the OTP screen on button press
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const OtpScreen()),
-                      );
+                    onPressed: () async {
+                      try {
+                        // Create the user in Firebase Authentication
+                        final credential = await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                        );
+
+                        // Save additional user data in Firestore
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(credential.user!.uid)
+                            .set({
+                          'fullName': fullNameController.text.trim(),
+                          'email': emailController.text.trim(),
+                          'phoneNumber': phoneNumberController.text.trim(),
+                        });
+
+                        // Registration successful, navigate to the OTP screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        // Handle registration errors
+                        print('Error: $e');
+                      } catch (e) {
+                        print(e);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xffffffff),
@@ -104,8 +139,7 @@ class SignUpPage extends StatelessWidget {
                       // Navigate to the login page
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
+                        MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
                     child: const Padding(
@@ -128,7 +162,9 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextFieldWithLabel(String label) {
+  Widget _buildTextFieldWithLabel(
+      String label, TextEditingController controller,
+      {bool isObscureText = false}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
       child: Column(
@@ -141,6 +177,8 @@ class SignUpPage extends StatelessWidget {
             ),
           ),
           TextField(
+            controller: controller,
+            obscureText: isObscureText,
             decoration: InputDecoration(
               hintText: label,
               hintStyle: const TextStyle(color: Colors.white70),

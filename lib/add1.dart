@@ -1,9 +1,48 @@
 import 'package:flutter/material.dart';
 import 'displayfarms.dart';
 import 'add2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddFarmsPage extends StatelessWidget {
-  const AddFarmsPage({super.key});
+  AddFarmsPage({Key? key}) : super(key: key);
+
+  late final TextEditingController _farmerNameController =
+      TextEditingController();
+  late final TextEditingController _phoneNumberController =
+      TextEditingController();
+  late final TextEditingController _addressLine1Controller =
+      TextEditingController();
+  late final TextEditingController _addressLine2Controller =
+      TextEditingController();
+  late final TextEditingController _addressLine3Controller =
+      TextEditingController();
+
+  Future<void> _saveFarmerDetails(BuildContext context) async {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Save farmer details under the specific user's document in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('FarmerDetails1')
+          .add({
+        'farmerName': _farmerNameController.text,
+        'phoneNumber': _phoneNumberController.text,
+        'addressLine1': _addressLine1Controller.text,
+        'addressLine2': _addressLine2Controller.text,
+        'addressLine3': _addressLine3Controller.text,
+      });
+
+      // Navigate to the next page (AddFarmsPage2 or any other page)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddFarmsPage2()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +50,12 @@ class AddFarmsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Add Farms',
-          style: TextStyle(color: Colors.white), // Text color
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xff006e21), // Background color
+        backgroundColor: const Color(0xff006e21),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Navigate back to the display farms page
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const DisplayFarms()),
@@ -39,46 +77,23 @@ class AddFarmsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            _buildTextFieldWithLabel('Farmer Name', 'Enter Farmer Name'),
-            const SizedBox(height: 10),
-            _buildTextFieldWithLabel('Phone Number', 'Enter Phone Number'),
-            const SizedBox(height: 10),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Farm Address',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Address Line 1',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Address Line 2',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Address Line 3 (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
+            _buildTextFieldWithLabel(
+              'Farmer Name',
+              'Enter Farmer Name',
+              _farmerNameController,
             ),
+            const SizedBox(height: 10),
+            _buildTextFieldWithLabel(
+              'Phone Number',
+              'Enter Phone Number',
+              _phoneNumberController,
+            ),
+            const SizedBox(height: 10),
+            _buildAddressTextField(),
             const SizedBox(height: 20),
             Row(
               children: [
-                const Icon(Icons.attach_file), // Attachment icon
+                const Icon(Icons.attach_file),
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
@@ -98,12 +113,7 @@ class AddFarmsPage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigate to AddFarmsPage2 when Continue button is pressed
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AddFarmsPage2()),
-                  );
+                  _saveFarmerDetails(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006227),
@@ -118,7 +128,8 @@ class AddFarmsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextFieldWithLabel(String label, String hintText) {
+  Widget _buildTextFieldWithLabel(
+      String label, String hintText, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -130,9 +141,48 @@ class AddFarmsPage extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         TextField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
             border: const OutlineInputBorder(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddressTextField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Farm Address',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _addressLine1Controller,
+          decoration: const InputDecoration(
+            hintText: 'Address Line 1',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _addressLine2Controller,
+          decoration: const InputDecoration(
+            hintText: 'Address Line 2',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _addressLine3Controller,
+          decoration: const InputDecoration(
+            hintText: 'Address Line 3 (optional)',
+            border: OutlineInputBorder(),
           ),
         ),
       ],

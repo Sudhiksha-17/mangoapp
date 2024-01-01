@@ -1,8 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'add3.dart';
 
 class AddFarmsPage2 extends StatelessWidget {
-  const AddFarmsPage2({super.key});
+  AddFarmsPage2({Key? key}) : super(key: key);
+
+  late final TextEditingController _farmLandController =
+      TextEditingController();
+  late final TextEditingController _mangoAreaController =
+      TextEditingController();
+  late final TextEditingController _otherCropsAreaController =
+      TextEditingController();
+
+  Future<void> _saveFarmDetails(BuildContext context) async {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Save farm details to Firestore under "FarmerDetails2" subcollection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('FarmerDetails2') // Change subcollection name here
+          .add({
+        'farmLandArea': _farmLandController.text,
+        'mangoArea': _mangoAreaController.text,
+        'otherCropsArea': _otherCropsAreaController.text,
+      });
+
+      // Navigate to the next page (MangoFarmDetailsPage or any other page)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddFarmPage3()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,12 +43,12 @@ class AddFarmsPage2 extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Add Farms',
-          style: TextStyle(color: Colors.white), // Text color
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xff006e21), // Background color
+        backgroundColor: const Color(0xff006e21),
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6), // Background color #D3FFA6
+        color: const Color(0xFFD3FFA6),
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,11 +63,18 @@ class AddFarmsPage2 extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             _buildHyperlinkedText('Farm location', 'Choose location on maps'),
-            _buildFormField('Farm Land', 'Enter area in acres'),
             _buildFormField(
-                'Area (Mangoes)', 'Area spent on mango trees in acres'),
+                'Farm Land', 'Enter area in acres', _farmLandController),
             _buildFormField(
-                'Area (Other crops)', 'Area spent on others in acres'),
+              'Area (Mangoes)',
+              'Area spent on mango trees in acres',
+              _mangoAreaController,
+            ),
+            _buildFormField(
+              'Area (Other crops)',
+              'Area spent on others in acres',
+              _otherCropsAreaController,
+            ),
             const SizedBox(height: 20.0),
             const SizedBox(height: 20.0),
             const SizedBox(height: 20.0),
@@ -42,11 +82,7 @@ class AddFarmsPage2 extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MangoFarmDetailsPage()),
-                  );
+                  _saveFarmDetails(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006227),
@@ -95,7 +131,8 @@ class AddFarmsPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildFormField(String heading, String placeholder) {
+  Widget _buildFormField(
+      String heading, String placeholder, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -108,6 +145,7 @@ class AddFarmsPage2 extends StatelessWidget {
         ),
         const SizedBox(height: 5.0),
         TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: placeholder,
             border: const OutlineInputBorder(),

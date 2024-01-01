@@ -1,8 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'add6.dart';
 
 class OtherPlantsDetailsPage2 extends StatelessWidget {
-  const OtherPlantsDetailsPage2({super.key});
+  OtherPlantsDetailsPage2({super.key});
+
+  late final TextEditingController _cropNameController =
+      TextEditingController();
+  late final TextEditingController _areaController = TextEditingController();
+  late final TextEditingController _plantCountController =
+      TextEditingController();
+  String _selectedIrrigationMethod = 'Drip irrigation';
+
+  Future<void> _saveOtherPlantsDetails(BuildContext context) async {
+    // Get the current user
+    var user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Save other plants details to Firestore under OtherPlantsDetails2 subsection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('OtherPlantsDetails2') // Change subcollection name here
+          .add({
+        'cropName': _cropNameController.text,
+        'area': _areaController.text,
+        'plantCount': _plantCountController.text,
+        'irrigationMethod': _selectedIrrigationMethod,
+      });
+
+      // Navigate to the next page (OtherPlantsDetailsPage or any other page)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtherPlantsDetailsPage(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,39 +70,44 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
             const SizedBox(height: 20),
             _buildSubHeading('Crop Name'),
             const SizedBox(height: 10),
-            _buildTextField('Name of the crop', TextInputType.text),
+            _buildTextField('Name of the crop', TextInputType.text,
+                controller: _cropNameController),
             const SizedBox(height: 20),
             _buildSubHeading('Area Utilized'),
             const SizedBox(height: 10),
             _buildTextField(
-                'Area spent on this crop in acres', TextInputType.number),
+                'Area spent on this crop in acres', TextInputType.number,
+                controller: _areaController),
             const SizedBox(height: 20),
             _buildSubHeading('Count of Plants'),
             const SizedBox(height: 10),
             _buildTextField(
-                'Number of plants of this crop', TextInputType.number),
+                'Number of plants of this crop', TextInputType.number,
+                controller: _plantCountController),
             const SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
             const SizedBox(height: 10),
             _buildDropDown(
               'Method of irrigation',
               ['Drip irrigation', 'Sprinkler irrigation', 'Surface irrigation'],
+              onChanged: (String? value) {
+                if (value != null) {
+                  _selectedIrrigationMethod = value;
+                }
+              },
             ),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const OtherPlantsDetailsPage()));
+                  // Save details when the "Continue" button is pressed
+                  _saveOtherPlantsDetails(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006227),
                 ),
-                child:
-                    const Text('Save', style: TextStyle(color: Colors.white)),
+                child: const Text('Continue',
+                    style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -84,8 +125,10 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      {required TextEditingController controller}) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: const OutlineInputBorder(),
@@ -94,7 +137,8 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildDropDown(String placeholder, List<String> options) {
+  Widget _buildDropDown(String placeholder, List<String> options,
+      {required void Function(String?) onChanged}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
@@ -111,9 +155,7 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
               child: Text(value),
             );
           }).toList(),
-          onChanged: (String? value) {
-            // Handle dropdown value changes
-          },
+          onChanged: onChanged,
         ),
       ),
     );

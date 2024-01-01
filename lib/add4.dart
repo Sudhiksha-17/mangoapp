@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
-import 'add5.dart';
-import 'add6.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mangoapp/add5.dart';
+import 'package:mangoapp/add6.dart';
 
 class MangoFarmDetailsPage1 extends StatelessWidget {
-  const MangoFarmDetailsPage1({super.key});
+  MangoFarmDetailsPage1({super.key});
+
+  String _selectedMangoVariety = 'Kesar';
+  late final TextEditingController _areaController = TextEditingController();
+  late final TextEditingController _treeCountController =
+      TextEditingController();
+  late final TextEditingController _ageOfTreesController =
+      TextEditingController();
+
+  Future<void> _saveMangoVarietyDetails(BuildContext context) async {
+    var user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Save mango variety details to Firestore under FarmDetails4 subsection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('FarmerDetails4')
+          .add({
+        'mangoVariety': _selectedMangoVariety,
+        'area': _areaController.text,
+        'treeCount': _treeCountController.text,
+        'ageOfTrees': _ageOfTreesController.text,
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,30 +63,43 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
             _buildSubHeading('Mango Variety'),
             const SizedBox(height: 10),
             _buildDropDown(
-                'Name of the mango variety', ['Kesar', 'Alphonso', 'Malgova']),
+              'Name of the mango variety',
+              ['Kesar', 'Alphonso', 'Malgova'],
+            ),
             const SizedBox(height: 20),
             _buildSubHeading('Area of this variety'),
             const SizedBox(height: 10),
             _buildTextField(
-                'Area spent on this variety in acres', TextInputType.number),
+              'Area spent on this variety in acres',
+              TextInputType.number,
+              controller: _areaController,
+            ),
             const SizedBox(height: 20),
             _buildSubHeading('Count of trees in this variety'),
             const SizedBox(height: 10),
             _buildTextField(
-                'Number of trees of this variety', TextInputType.number),
+              'Number of trees of this variety',
+              TextInputType.number,
+              controller: _treeCountController,
+            ),
             const SizedBox(height: 20),
             _buildSubHeading('Age of trees'),
             const SizedBox(height: 10),
-            _buildTextField('Period since the trees are planted(in yrs/months)',
-                TextInputType.text),
+            _buildTextField(
+              'Period since the trees are planted(in yrs/months)',
+              TextInputType.text,
+              controller: _ageOfTreesController,
+            ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () {
-                // Navigation logic to the next page for adding crops
+              onTap: () async {
+                await _saveMangoVarietyDetails(context);
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MangoFarmDetailsPage2()));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OtherPlantsDetailsPage(),
+                  ),
+                );
               },
               child: const Text(
                 '+ Add variety',
@@ -72,13 +112,14 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  // Implement continue button functionality
+                onPressed: () async {
+                  await _saveMangoVarietyDetails(context);
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const OtherPlantsDetailsPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OtherPlantsDetailsPage(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006227),
@@ -102,8 +143,13 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(
+    String placeholder,
+    TextInputType inputType, {
+    required TextEditingController controller,
+  }) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: const OutlineInputBorder(),
@@ -123,6 +169,7 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value: _selectedMangoVariety,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -130,7 +177,9 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
+            if (value != null) {
+              _selectedMangoVariety = value;
+            }
           },
         ),
       ),

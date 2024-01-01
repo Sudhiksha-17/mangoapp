@@ -1,8 +1,45 @@
 import 'package:flutter/material.dart';
-import 'add4.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mangoapp/add4.dart';
 
-class MangoFarmDetailsPage extends StatelessWidget {
-  const MangoFarmDetailsPage({super.key});
+class AddFarmPage3 extends StatelessWidget {
+  AddFarmPage3({super.key});
+
+  final TextEditingController _numberOfVarietyController =
+      TextEditingController();
+  final TextEditingController _numberOfTreesController =
+      TextEditingController();
+  String _selectedIrrigationMethod = 'null';
+  final TextEditingController _yieldController = TextEditingController();
+
+  Future<void> _saveMangoFarmDetails(BuildContext context) async {
+    // Get the current user
+    var user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Save mango farm details to Firestore under MangoFarmDetails collection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('FarmerDetails3') // Change subcollection name here
+          .add({
+        'userId': user.uid,
+        'numberOfVarieties': _numberOfVarietyController.text,
+        'numberOfTrees': _numberOfTreesController.text,
+        'irrigationMethod': _selectedIrrigationMethod,
+        'yieldInPreviousYear': _yieldController.text,
+      });
+
+      // Navigate to the next page (MangoFarmDetailsPage1 or any other page)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MangoFarmDetailsPage1(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,35 +71,36 @@ class MangoFarmDetailsPage extends StatelessWidget {
             const SizedBox(height: 20),
             _buildSubHeading('Mango Varieties'),
             const SizedBox(height: 10),
-            _buildTextField('Number of mango variety', TextInputType.number),
+            _buildTextField('Number of mango variety', TextInputType.number,
+                controller: _numberOfVarietyController),
             const SizedBox(height: 20),
             _buildSubHeading('Count of Mango Trees'),
             const SizedBox(height: 10),
-            _buildTextField('Number of mango tree', TextInputType.number),
+            _buildTextField('Number of mango tree', TextInputType.number,
+                controller: _numberOfTreesController),
             const SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
             const SizedBox(height: 10),
             _buildDropDown(
               'Method of irrigation',
               ['Drip irrigation', 'Sprinkler irrigation', 'Surface irrigation'],
+              onChanged: (String? value) {
+                _selectedIrrigationMethod = value ?? '';
+              },
             ),
             const SizedBox(height: 20),
             _buildSubHeading('Yield in Previous Year'),
             const SizedBox(height: 10),
             _buildTextField(
-                'Yield of mangoes in the previous year', TextInputType.number),
+                'Yield of mangoes in the previous year', TextInputType.number,
+                controller: _yieldController),
             const SizedBox(height: 20),
             const SizedBox(height: 20.0),
             const SizedBox(height: 20.0),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  //MangoFarmDetailsPage1
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MangoFarmDetailsPage1()),
-                  );
+                  _saveMangoFarmDetails(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006227),
@@ -86,8 +124,10 @@ class MangoFarmDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      {required TextEditingController controller}) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: const OutlineInputBorder(),
@@ -96,7 +136,8 @@ class MangoFarmDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDropDown(String placeholder, List<String> options) {
+  Widget _buildDropDown(String placeholder, List<String> options,
+      {required ValueChanged<String?> onChanged}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
@@ -113,9 +154,7 @@ class MangoFarmDetailsPage extends StatelessWidget {
               child: Text(value),
             );
           }).toList(),
-          onChanged: (String? value) {
-            // Handle dropdown value changes
-          },
+          onChanged: onChanged,
         ),
       ),
     );
