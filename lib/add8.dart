@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mangoapp/displayfarms.dart';
 
 class FarmAddedSuccessPage extends StatelessWidget {
   const FarmAddedSuccessPage({super.key});
@@ -7,28 +8,30 @@ class FarmAddedSuccessPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF006227),
+        backgroundColor: Color(0xffffc900),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6),
+        color: Color(0xffffffff),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              /*
               Container(
                 width: 120,
                 height: 120,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color(0xFF006227),
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.check,
                     size: 80,
@@ -36,8 +39,41 @@ class FarmAddedSuccessPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
+                'Farm was added successfully!!',
+                style: TextStyle(
+                  color: Color(0xFF006227),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),*/
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the AddFarms2Page when the add icon is clicked
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FarmsPage()),
+                  );
+                },
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF006227),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.check,
+                      size: 80,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
                 'Farm was added successfully!!',
                 style: TextStyle(
                   color: Color(0xFF006227),

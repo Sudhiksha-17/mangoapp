@@ -1,45 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mangoapp/displayfarms.dart';
 import 'signup.dart';
-import 'otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
 
-  late final TextEditingController _phoneNumberController =
-      TextEditingController();
   late final TextEditingController _emailController = TextEditingController();
   late final TextEditingController _passwordController =
       TextEditingController();
-
-  Future<void> _signInWithPhoneNumber(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: _phoneNumberController.text,
-        timeout: const Duration(seconds: 60),
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const OtpScreen()),
-          );
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          print('Verification Failed: ${e.message}');
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => OtpScreen()),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      print('Error during phone number sign in: $e');
-    }
-  }
 
   Future<void> _signInWithEmailAndPassword(BuildContext context) async {
     try {
@@ -49,10 +18,11 @@ class LoginPage extends StatelessWidget {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DisplayFarms()),
+        MaterialPageRoute(builder: (context) => FarmsPage()),
       );
     } catch (e) {
       print('Error during email/password sign in: $e');
+      // Handle the error, for example, display an error message
     }
   }
 
@@ -87,10 +57,6 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20.0),
               _buildTextFieldWithLabel(
-                'Enter your Mobile number',
-                controller: _phoneNumberController,
-              ),
-              _buildTextFieldWithLabel(
                 'Enter your Email',
                 controller: _emailController,
               ),
@@ -102,9 +68,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  if (_phoneNumberController.text.isNotEmpty) {
-                    _signInWithPhoneNumber(context);
-                  } else if (_emailController.text.isNotEmpty &&
+                  if (_emailController.text.isNotEmpty &&
                       _passwordController.text.isNotEmpty) {
                     _signInWithEmailAndPassword(context);
                   }

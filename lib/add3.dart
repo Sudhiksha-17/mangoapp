@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangoapp/add4.dart';
 
-class AddFarmPage3 extends StatelessWidget {
-  AddFarmPage3({super.key});
+class MangoFarmDetailsPage extends StatelessWidget {
+  MangoFarmDetailsPage({super.key});
 
   final TextEditingController _numberOfVarietyController =
       TextEditingController();
@@ -45,68 +45,67 @@ class AddFarmPage3 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF006227),
+        backgroundColor: Color(0xffffc900),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6),
-        padding: const EdgeInsets.all(20.0),
+        color: Color(0xffffffff),
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
+            Center(
               child: Text(
                 'Please enter mango farm details here',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Color(0xff218f00),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildSubHeading('Mango Varieties'),
-            const SizedBox(height: 10),
-            _buildTextField('Number of mango variety', TextInputType.number,
-                controller: _numberOfVarietyController),
-            const SizedBox(height: 20),
+            SizedBox(height: 10),
+            _buildTextField('Number of mango variety', TextInputType.number),
+            SizedBox(height: 20),
             _buildSubHeading('Count of Mango Trees'),
-            const SizedBox(height: 10),
-            _buildTextField('Number of mango tree', TextInputType.number,
-                controller: _numberOfTreesController),
-            const SizedBox(height: 20),
+            SizedBox(height: 10),
+            _buildTextField('Number of mango tree', TextInputType.number),
+            SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _buildDropDown(
               'Method of irrigation',
               ['Drip irrigation', 'Sprinkler irrigation', 'Surface irrigation'],
-              onChanged: (String? value) {
-                _selectedIrrigationMethod = value ?? '';
-              },
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildSubHeading('Yield in Previous Year'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _buildTextField(
-                'Yield of mangoes in the previous year', TextInputType.number,
-                controller: _yieldController),
-            const SizedBox(height: 20),
-            const SizedBox(height: 20.0),
-            const SizedBox(height: 20.0),
+                'Yield of mangoes in the previous year', TextInputType.number),
+            SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _saveMangoFarmDetails(context);
+                  //MangoFarmDetailsPage1
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MangoFarmDetailsPage1()),
+                  );
                 },
+                child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006227),
+                  primary: Color(0xFF006227),
                 ),
-                child: const Text('Continue',
-                    style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -118,28 +117,26 @@ class AddFarmPage3 extends StatelessWidget {
   Widget _buildSubHeading(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontWeight: FontWeight.bold,
+        color: Color(0xff218f00),
       ),
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType,
-      {required TextEditingController controller}) {
+  Widget _buildTextField(String placeholder, TextInputType inputType) {
     return TextField(
-      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(),
       ),
       keyboardType: inputType,
     );
   }
 
-  Widget _buildDropDown(String placeholder, List<String> options,
-      {required ValueChanged<String?> onChanged}) {
+  Widget _buildDropDown(String placeholder, List<String> options) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(5.0),
@@ -154,7 +151,9 @@ class AddFarmPage3 extends StatelessWidget {
               child: Text(value),
             );
           }).toList(),
-          onChanged: onChanged,
+          onChanged: (String? value) {
+            // Handle dropdown value changes
+          },
         ),
       ),
     );

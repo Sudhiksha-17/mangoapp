@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "293788156278",
-    "project_id": "mango-d0cf8",
-    "storage_bucket": "mango-d0cf8.appspot.com"
+    "project_number": "145442604057",
+    "project_id": "tracemango-c38af",
+    "storage_bucket": "tracemango-c38af.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:293788156278:android:8811e8840b5623853dfa57",
+        "mobilesdk_app_id": "1:145442604057:android:7c3da871eed737fac61688",
         "android_client_info": {
           "package_name": "com.example.mangoapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDFj63lyjFKH976FgtPjgoQQCJ5Gja2FTo"
+          "current_key": "AIzaSyA6bAnLN4MWSw9LVzykjQ6BGKqr4jZCzKA"
         }
       ],
       "services": {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mangoapp/add9.dart';
 import 'add7.dart'; // Import OtherPlantsDetailsPage2 if not already done
 import 'add8.dart'; // Import FarmAddedSuccessPage if not already done
 
@@ -36,54 +37,54 @@ class OtherPlantsDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF006227),
+        backgroundColor: Color(0xffffc900),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6),
-        padding: const EdgeInsets.all(20.0),
+        color: Color(0xffffffff),
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
+            Center(
               child: Text(
                 'Please enter details about other plants here',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Color(0xff218f00),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildSubHeading('Crop Name'),
-            const SizedBox(height: 10),
-            _buildTextField('Name of the crop', TextInputType.text,
-                controller: _cropNameController),
-            const SizedBox(height: 20),
+            SizedBox(height: 10),
+            _buildTextField('Name of the crop', TextInputType.text),
+            SizedBox(height: 20),
             _buildSubHeading('Area Utilized'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _buildTextField(
-                'Area spent on this crop in acres', TextInputType.number,
-                controller: _areaUtilizedController),
-            const SizedBox(height: 20),
+                'Area spent on this crop in acres', TextInputType.number),
+            SizedBox(height: 20),
             _buildSubHeading('Count of Plants'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _buildTextField(
-                'Number of plants of this crop', TextInputType.number,
-                controller: _countOfPlantsController),
-            const SizedBox(height: 20),
+                'Number of plants of this crop', TextInputType.number),
+            SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _buildDropDown(
               'Method of irrigation',
               ['Drip irrigation', 'Sprinkler irrigation', 'Surface irrigation'],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 // Navigation logic to the next page for adding crops
@@ -92,7 +93,7 @@ class OtherPlantsDetailsPage extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (context) => OtherPlantsDetailsPage2()));
               },
-              child: const Text(
+              child: Text(
                 '+ Add crop',
                 style: TextStyle(
                   color: Colors.blue,
@@ -104,19 +105,13 @@ class OtherPlantsDetailsPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   // Implement submit button functionality
-                  _saveCropDetails(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FarmAddedSuccessPage(),
-                    ),
-                  );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => UploadScreen()));
                 },
+                child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006227),
+                  primary: Color(0xFF006227),
                 ),
-                child:
-                    const Text('Submit', style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -128,22 +123,18 @@ class OtherPlantsDetailsPage extends StatelessWidget {
   Widget _buildSubHeading(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontWeight: FontWeight.bold,
+        color: Color(0xff218f00),
       ),
     );
   }
 
-  Widget _buildTextField(
-    String placeholder,
-    TextInputType inputType, {
-    required TextEditingController controller,
-  }) {
+  Widget _buildTextField(String placeholder, TextInputType inputType) {
     return TextField(
-      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(),
       ),
       keyboardType: inputType,
     );
@@ -151,7 +142,7 @@ class OtherPlantsDetailsPage extends StatelessWidget {
 
   Widget _buildDropDown(String placeholder, List<String> options) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(5.0),
@@ -160,7 +151,6 @@ class OtherPlantsDetailsPage extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
-          value: _selectedIrrigationMethod,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -169,9 +159,6 @@ class OtherPlantsDetailsPage extends StatelessWidget {
           }).toList(),
           onChanged: (String? value) {
             // Handle dropdown value changes
-            if (value != null) {
-              _selectedIrrigationMethod = value;
-            }
           },
         ),
       ),

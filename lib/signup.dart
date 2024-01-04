@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'main.dart';
-import 'otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mangoapp/login.dart';
+import 'displayfarms.dart';
 
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({Key? key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({Key? key}) : super(key: key);
+
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim());
+
+      // Additional actions after successful signup
+      // For example, you might navigate to the home screen
+      print('User registered: ${userCredential.user?.email}');
+
+      // Navigate to the DisplayFarms screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FarmsPage(),
+        ),
+      );
+    } catch (e) {
+      print('Error during email/password sign-up: $e');
+      // Handle the error, for example, display an error message
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController fullNameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController phoneNumberController = TextEditingController();
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -26,17 +52,11 @@ class SignUpPage extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Top-left back button
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () {
-                  // Navigate back to the welcome page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WelcomePage()),
-                  );
+                  Navigator.pop(context);
                 },
                 child: const Icon(
                   Icons.arrow_back,
@@ -44,17 +64,12 @@ class SignUpPage extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Center content
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Personal account icon
                   const Icon(Icons.account_circle,
                       size: 100.0, color: Colors.white),
-
-                  // "Sign up" text
                   const Padding(
                     padding: EdgeInsets.only(top: 8.0),
                     child: Text(
@@ -66,65 +81,12 @@ class SignUpPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // Full Name text and text field
                   _buildTextFieldWithLabel('Full Name', fullNameController),
-
-                  // Email text and text field
                   _buildTextFieldWithLabel('Email', emailController),
-
-                  // Mobile Number text and text field
-                  _buildTextFieldWithLabel(
-                      'Mobile Number', phoneNumberController),
-
-                  // Password text and text field
-                  _buildTextFieldWithLabel('Password', passwordController,
-                      isObscureText: true),
-
-                  // Terms & Conditions text
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-                    child: Text(
-                      '* By signing up, you agree to our\nTerms & Conditions and Policies',
-                      style: TextStyle(
-                        fontSize: 10.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-
-                  // Continue button with Firebase authentication
+                  _buildTextFieldWithLabel('Password', passwordController),
                   ElevatedButton(
                     onPressed: () async {
-                      try {
-                        // Create the user in Firebase Authentication
-                        final credential = await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                          email: emailController.text.trim(),
-                          password: passwordController.text.trim(),
-                        );
-
-                        // Save additional user data in Firestore
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(credential.user!.uid)
-                            .set({
-                          'fullName': fullNameController.text.trim(),
-                          'email': emailController.text.trim(),
-                          'phoneNumber': phoneNumberController.text.trim(),
-                        });
-
-                        // Registration successful, navigate to the OTP screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        );
-                      } on FirebaseAuthException catch (e) {
-                        // Handle registration errors
-                        print('Error: $e');
-                      } catch (e) {
-                        print(e);
-                      }
+                      await _signUpWithEmailAndPassword(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xffffffff),
@@ -132,14 +94,15 @@ class SignUpPage extends StatelessWidget {
                     child: const Text('Continue',
                         style: TextStyle(color: Color(0xFF006227))),
                   ),
-
-                  // Already have an account? Log in hyperlink
                   InkWell(
                     onTap: () {
                       // Navigate to the login page
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LoginPage(), // Replace LoginPage with the actual login page class
+                        ),
                       );
                     },
                     child: const Padding(
@@ -163,8 +126,7 @@ class SignUpPage extends StatelessWidget {
   }
 
   Widget _buildTextFieldWithLabel(
-      String label, TextEditingController controller,
-      {bool isObscureText = false}) {
+      String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
       child: Column(
@@ -178,7 +140,6 @@ class SignUpPage extends StatelessWidget {
           ),
           TextField(
             controller: controller,
-            obscureText: isObscureText,
             decoration: InputDecoration(
               hintText: label,
               hintStyle: const TextStyle(color: Colors.white70),

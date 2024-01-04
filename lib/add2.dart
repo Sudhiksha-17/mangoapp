@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
 import 'add3.dart';
 
-class AddFarmsPage2 extends StatelessWidget {
+class AddFarmsPage2 extends StatefulWidget {
   AddFarmsPage2({Key? key}) : super(key: key);
 
+  @override
+  _AddFarmsPage2State createState() => _AddFarmsPage2State();
+}
+
+class _AddFarmsPage2State extends State<AddFarmsPage2> {
   late final TextEditingController _farmLandController =
       TextEditingController();
   late final TextEditingController _mangoAreaController =
@@ -13,26 +19,55 @@ class AddFarmsPage2 extends StatelessWidget {
   late final TextEditingController _otherCropsAreaController =
       TextEditingController();
 
+  LocationData? _locationData;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _retrieveLocation() async {
+    Location location = Location();
+    try {
+      LocationData currentLocation = await location.getLocation();
+      setState(() {
+        _locationData = currentLocation;
+      });
+    } catch (e) {
+      print("Error getting location: $e");
+    }
+  }
+
+  // Convert LocationData to JSON format
+  Map<String, dynamic> _locationDataToJson(LocationData locationData) {
+    return {
+      'latitude': locationData.latitude,
+      'longitude': locationData.longitude,
+      'accuracy': locationData.accuracy,
+      // Add other properties as needed
+    };
+  }
+
   Future<void> _saveFarmDetails(BuildContext context) async {
-    // Get the current user
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Save farm details to Firestore under "FarmerDetails2" subcollection
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .collection('FarmerDetails2') // Change subcollection name here
+          .collection('FarmerDetails2')
           .add({
         'farmLandArea': _farmLandController.text,
         'mangoArea': _mangoAreaController.text,
         'otherCropsArea': _otherCropsAreaController.text,
+        'location': _locationData != null
+            ? _locationDataToJson(_locationData!)
+            : null, // Save location data
       });
 
-      // Navigate to the next page (MangoFarmDetailsPage or any other page)
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => AddFarmPage3()),
+        MaterialPageRoute(builder: (context) => MangoFarmDetailsPage()),
       );
     }
   }
@@ -41,54 +76,58 @@ class AddFarmsPage2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Add Farms',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xff054500)), // Text color
         ),
-        backgroundColor: const Color(0xff006e21),
+        backgroundColor: Color(0xffffc900),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
+          onPressed: () {
+            // Navigate back to the display farms page
+            Navigator.pop(context);
+          },
+        ), // Background color
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6),
-        padding: const EdgeInsets.all(20.0),
+        color: Color(0xffffffff), // Background color #D3FFA6
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Please enter farm details here',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: Color(0xff218f00),
               ),
             ),
-            const SizedBox(height: 20.0),
+            SizedBox(height: 20.0),
             _buildHyperlinkedText('Farm location', 'Choose location on maps'),
+            _buildFormField('Farm Land', 'Enter area in acres'),
             _buildFormField(
-                'Farm Land', 'Enter area in acres', _farmLandController),
+                'Area (Mangoes)', 'Area spent on mango trees in acres'),
             _buildFormField(
-              'Area (Mangoes)',
-              'Area spent on mango trees in acres',
-              _mangoAreaController,
-            ),
-            _buildFormField(
-              'Area (Other crops)',
-              'Area spent on others in acres',
-              _otherCropsAreaController,
-            ),
-            const SizedBox(height: 20.0),
-            const SizedBox(height: 20.0),
-            const SizedBox(height: 20.0),
-            const SizedBox(height: 20.0),
+                'Area (Other crops)', 'Area spent on others in acres'),
+            SizedBox(height: 20.0),
+            SizedBox(height: 20.0),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _saveFarmDetails(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MangoFarmDetailsPage()),
+                  );
                 },
+                child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006227),
+                  primary: Color(0xFF006227),
                 ),
-                child: const Text('Continue',
-                    style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -101,25 +140,26 @@ class AddFarmsPage2 extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 20.0),
+        SizedBox(height: 20.0),
         Text(
           heading,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: Color(0xff218f00),
           ),
         ),
-        const SizedBox(height: 5.0),
+        SizedBox(height: 5.0),
         GestureDetector(
           onTap: () {
-            // Add functionality for tapping the hyperlinked text
+            _retrieveLocation(); // Retrieve location when clicked
           },
           child: Row(
             children: [
-              const Icon(Icons.location_pin),
-              const SizedBox(width: 5.0),
+              Icon(Icons.location_pin),
+              SizedBox(width: 5.0),
               Text(
                 text,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
                 ),
@@ -131,24 +171,23 @@ class AddFarmsPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildFormField(
-      String heading, String placeholder, TextEditingController controller) {
+  Widget _buildFormField(String heading, String placeholder) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 20.0),
+        SizedBox(height: 20.0),
         Text(
           heading,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: Color(0xff218f00),
           ),
         ),
-        const SizedBox(height: 5.0),
+        SizedBox(height: 5.0),
         TextFormField(
-          controller: controller,
           decoration: InputDecoration(
             hintText: placeholder,
-            border: const OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
         ),
       ],

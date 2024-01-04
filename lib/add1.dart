@@ -48,58 +48,79 @@ class AddFarmsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Add Farms',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xff054500)), // Text color
         ),
-        backgroundColor: const Color(0xff006e21),
+        backgroundColor: Color(0xffffc900), // Background color
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
           onPressed: () {
+            // Navigate back to the display farms page
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const DisplayFarms()),
+              MaterialPageRoute(builder: (context) => FarmsPage()),
             );
           },
         ),
       ),
       body: Container(
-        color: const Color(0xFFD3FFA6),
-        padding: const EdgeInsets.all(20.0),
+        color: Color(0xffffffff),
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Please enter farm details here',
               style: TextStyle(
                 fontSize: 18,
+                color: Color(0xff218f00),
                 fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
               ),
             ),
-            const SizedBox(height: 10),
-            _buildTextFieldWithLabel(
-              'Farmer Name',
-              'Enter Farmer Name',
-              _farmerNameController,
+            SizedBox(height: 10),
+            _buildTextFieldWithLabel('Farmer Name', 'Enter Farmer Name'),
+            SizedBox(height: 10),
+            _buildTextFieldWithLabel('Phone Number', 'Enter Phone Number'),
+            SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Farm Address',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff218f00),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Address Line 1',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Address Line 2(optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            _buildTextFieldWithLabel(
-              'Phone Number',
-              'Enter Phone Number',
-              _phoneNumberController,
-            ),
-            const SizedBox(height: 10),
-            _buildAddressTextField(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               children: [
-                const Icon(Icons.attach_file),
-                const SizedBox(width: 8),
+                Icon(Icons.attach_file), // Attachment icon
+                SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
                     // Implement the logic to upload farmer ID proof
                   },
-                  child: const Text(
+                  child: Text(
                     'Farmer ID Proof',
                     style: TextStyle(
                       color: Colors.blue,
@@ -109,17 +130,20 @@ class AddFarmsPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 30),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _saveFarmerDetails(context);
+                  // Navigate to AddFarmsPage2 when Continue button is pressed
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddFarmsPage2()),
+                  );
                 },
+                child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006227),
+                  primary: Color(0xFF006227),
                 ),
-                child: const Text('Continue',
-                    style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -128,60 +152,21 @@ class AddFarmsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextFieldWithLabel(
-      String label, String hintText, TextEditingController controller) {
+  Widget _buildTextFieldWithLabel(String label, String hintText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddressTextField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Farm Address',
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: Color(0xff218f00),
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         TextField(
-          controller: _addressLine1Controller,
-          decoration: const InputDecoration(
-            hintText: 'Address Line 1',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: _addressLine2Controller,
-          decoration: const InputDecoration(
-            hintText: 'Address Line 2',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: _addressLine3Controller,
-          decoration: const InputDecoration(
-            hintText: 'Address Line 3 (optional)',
+          decoration: InputDecoration(
+            hintText: hintText,
             border: OutlineInputBorder(),
           ),
         ),
