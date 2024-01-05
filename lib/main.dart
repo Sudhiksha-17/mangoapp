@@ -54,8 +54,7 @@ class WelcomePage extends StatelessWidget {
                       color: Color(0xFF006e21), // Background color for the logo
                       borderRadius: BorderRadius.circular(10.0),
                       image: DecorationImage(
-                        image: NetworkImage(
-                            'https://www.mangopoint.in/wp-content/uploads/2018/06/logo.png'), // Replace with your logo image URL
+                        image: AssetImage('assets/logo.png'),
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -100,7 +99,7 @@ class WelcomePage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Text(
-                  'Powered by Matic',
+                  'Powered by MATIC',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,

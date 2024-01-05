@@ -12,8 +12,10 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   TextEditingController fullNameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController(); 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  
 
   Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
     try {
@@ -82,8 +84,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   _buildTextFieldWithLabel('Full Name', fullNameController),
+                  _buildTextFieldWithLabel('Phone Number', phoneNumberController),
                   _buildTextFieldWithLabel('Email', emailController),
                   _buildTextFieldWithLabel('Password', passwordController),
+                  
                   ElevatedButton(
                     onPressed: () async {
                       await _signUpWithEmailAndPassword(context);
