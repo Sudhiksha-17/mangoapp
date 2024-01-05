@@ -5,7 +5,9 @@ import 'package:location/location.dart';
 import 'add3.dart';
 
 class AddFarmsPage2 extends StatefulWidget {
-  AddFarmsPage2({Key? key}) : super(key: key);
+  final String farmId;
+
+  AddFarmsPage2({required this.farmId, Key? key}) : super(key: key);
 
   @override
   _AddFarmsPage2State createState() => _AddFarmsPage2State();
@@ -52,11 +54,13 @@ class _AddFarmsPage2State extends State<AddFarmsPage2> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
+      // Use the provided farmId parameter to create the subfolder
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
+
       await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('FarmerDetails2')
-          .add({
+          .collection(subfolder)
+          .doc('FarmerDetails2') // Store details under FarmerDetails2 document
+          .set({
         'farmLandArea': _farmLandController.text,
         'mangoArea': _mangoAreaController.text,
         'otherCropsArea': _otherCropsAreaController.text,
@@ -67,7 +71,8 @@ class _AddFarmsPage2State extends State<AddFarmsPage2> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => MangoFarmDetailsPage()),
+        MaterialPageRoute(
+            builder: (context) => MangoFarmDetailsPage(farmId: widget.farmId)),
       );
     }
   }
@@ -108,21 +113,18 @@ class _AddFarmsPage2State extends State<AddFarmsPage2> {
             ),
             SizedBox(height: 20.0),
             _buildHyperlinkedText('Farm location', 'Choose location on maps'),
-            _buildFormField('Farm Land', 'Enter area in acres'),
             _buildFormField(
-                'Area (Mangoes)', 'Area spent on mango trees in acres'),
-            _buildFormField(
-                'Area (Other crops)', 'Area spent on others in acres'),
+                'Farm Land', 'Enter area in acres', _farmLandController),
+            _buildFormField('Area (Mangoes)',
+                'Area spent on mango trees in acres', _mangoAreaController),
+            _buildFormField('Area (Other crops)',
+                'Area spent on others in acres', _otherCropsAreaController),
             SizedBox(height: 20.0),
             SizedBox(height: 20.0),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MangoFarmDetailsPage()),
-                  );
+                  _saveFarmDetails(context);
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -171,7 +173,8 @@ class _AddFarmsPage2State extends State<AddFarmsPage2> {
     );
   }
 
-  Widget _buildFormField(String heading, String placeholder) {
+  Widget _buildFormField(
+      String heading, String placeholder, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -185,6 +188,7 @@ class _AddFarmsPage2State extends State<AddFarmsPage2> {
         ),
         SizedBox(height: 5.0),
         TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: placeholder,
             border: OutlineInputBorder(),

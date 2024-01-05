@@ -88,6 +88,60 @@ class _FarmsPageState extends State<FarmsPage> {
     }
   }
 
+  Future<String> _generateFarmId(String userId) async {
+    // Fetch the current farmId count and increment it by 1
+    var snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('FarmDetails')
+        .get();
+
+    int farmCount = snapshot.docs.length + 1;
+    String paddedCount = farmCount.toString().padLeft(3, '0');
+
+    // Generate farmId by combining unique ID and 3-digit number
+    String farmId = '${userId.substring(0, 6)}_$paddedCount';
+
+    return farmId;
+  }
+
+  void _addFarm() async {
+    try {
+      var user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        // User not authenticated, handle accordingly
+        return;
+      }
+
+      // Generate farmId as a combination of unique ID and a 3-digit number
+      String farmId = await _generateFarmId(user.uid);
+
+      // Create an empty subfolder with the farmId under the user's document
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('FarmDetails')
+          .doc(farmId)
+          .set({});
+
+      // Navigate to AddFarmsPage and wait for result
+      var result = await Navigator.push<Farm>(
+        context,
+        MaterialPageRoute(builder: (context) => AddFarmsPage(farmId: farmId)),
+      );
+
+      // If result is not null (user added a farm), update farms list
+      if (result != null) {
+        farms.add(result);
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error adding farm: $e');
+      // Handle the error, for example, display an error message
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -118,11 +172,7 @@ class _FarmsPageState extends State<FarmsPage> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Implement submit button functionality
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => AddFarmsPage()));
-          },
+          onPressed: _addFarm,
           child: Icon(Icons.add),
         ),
       ),
