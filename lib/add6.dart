@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mangoapp/add9.dart';
+import 'add9.dart';
 import 'add7.dart'; // Import OtherPlantsDetailsPage2 if not already done
 import 'add8.dart'; // Import FarmAddedSuccessPage if not already done
 
 class OtherPlantsDetailsPage extends StatelessWidget {
-  OtherPlantsDetailsPage({super.key});
+  final String farmId; // Add farmId as a parameter
+
+  OtherPlantsDetailsPage({required this.farmId, Key? key}) : super(key: key);
 
   final TextEditingController _cropNameController = TextEditingController();
   final TextEditingController _areaUtilizedController = TextEditingController();
@@ -19,12 +21,13 @@ class OtherPlantsDetailsPage extends StatelessWidget {
     var user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Save crop details to Firestore under OtherPlantsDetails subsection
+      // Save crop details to Firestore under FarmerDetails6 subsection
+      String subfolder = 'users/${user.uid}/$farmId/';
+
       await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('OtherPlantsDetails') // Change subcollection name here
-          .add({
+          .collection(subfolder)
+          .doc('OtherPlantDetails1')
+          .set({
         'cropName': _cropNameController.text,
         'areaUtilized': _areaUtilizedController.text,
         'countOfPlants': _countOfPlantsController.text,
@@ -66,17 +69,18 @@ class OtherPlantsDetailsPage extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Crop Name'),
             SizedBox(height: 10),
-            _buildTextField('Name of the crop', TextInputType.text),
+            _buildTextField(
+                'Name of the crop', TextInputType.text, _cropNameController),
             SizedBox(height: 20),
             _buildSubHeading('Area Utilized'),
             SizedBox(height: 10),
-            _buildTextField(
-                'Area spent on this crop in acres', TextInputType.number),
+            _buildTextField('Area spent on this crop in acres',
+                TextInputType.number, _areaUtilizedController),
             SizedBox(height: 20),
             _buildSubHeading('Count of Plants'),
             SizedBox(height: 10),
-            _buildTextField(
-                'Number of plants of this crop', TextInputType.number),
+            _buildTextField('Number of plants of this crop',
+                TextInputType.number, _countOfPlantsController),
             SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
             SizedBox(height: 10),
@@ -91,7 +95,8 @@ class OtherPlantsDetailsPage extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => OtherPlantsDetailsPage2()));
+                        builder: (context) =>
+                            OtherPlantsDetailsPage2(farmId: farmId)));
               },
               child: Text(
                 '+ Add crop',
@@ -105,8 +110,11 @@ class OtherPlantsDetailsPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   // Implement submit button functionality
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => UploadScreen()));
+                  _saveCropDetails(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UploadScreen(farmId: farmId)));
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -130,8 +138,10 @@ class OtherPlantsDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      TextEditingController controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: OutlineInputBorder(),

@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'add6.dart';
 
 class OtherPlantsDetailsPage2 extends StatelessWidget {
-  OtherPlantsDetailsPage2({super.key});
+  final String farmId; // Add farmId as a parameter
 
-  late final TextEditingController _cropNameController =
-      TextEditingController();
-  late final TextEditingController _areaController = TextEditingController();
-  late final TextEditingController _plantCountController =
-      TextEditingController();
+  OtherPlantsDetailsPage2({required this.farmId, Key? key}) : super(key: key);
+
+  final TextEditingController _cropNameController = TextEditingController();
+  final TextEditingController _areaController = TextEditingController();
+  final TextEditingController _plantCountController = TextEditingController();
   String _selectedIrrigationMethod = 'Drip irrigation';
 
   Future<void> _saveOtherPlantsDetails(BuildContext context) async {
@@ -18,12 +18,13 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
     var user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Save other plants details to Firestore under OtherPlantsDetails2 subsection
+      // Save other plants details to Firestore under FarmerDetails7 subsection
+      String subfolder = 'users/${user.uid}/$farmId/';
+
       await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('OtherPlantsDetails2') // Change subcollection name here
-          .add({
+          .collection(subfolder)
+          .doc('OtherPlantDetails2')
+          .set({
         'cropName': _cropNameController.text,
         'area': _areaController.text,
         'plantCount': _plantCountController.text,
@@ -34,7 +35,7 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OtherPlantsDetailsPage(),
+          builder: (context) => OtherPlantsDetailsPage(farmId: farmId),
         ),
       );
     }
@@ -73,17 +74,18 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Crop Name'),
             SizedBox(height: 10),
-            _buildTextField('Name of the crop', TextInputType.text),
+            _buildTextField(
+                'Name of the crop', TextInputType.text, _cropNameController),
             SizedBox(height: 20),
             _buildSubHeading('Area Utilized'),
             SizedBox(height: 10),
-            _buildTextField(
-                'Area spent on this crop in acres', TextInputType.number),
+            _buildTextField('Area spent on this crop in acres',
+                TextInputType.number, _areaController),
             SizedBox(height: 20),
             _buildSubHeading('Count of Plants'),
             SizedBox(height: 10),
-            _buildTextField(
-                'Number of plants of this crop', TextInputType.number),
+            _buildTextField('Number of plants of this crop',
+                TextInputType.number, _plantCountController),
             SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
             SizedBox(height: 10),
@@ -95,10 +97,7 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => OtherPlantsDetailsPage()));
+                  _saveOtherPlantsDetails(context);
                 },
                 child: Text('Save', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -122,8 +121,10 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      TextEditingController controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: OutlineInputBorder(),

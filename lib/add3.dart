@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangoapp/add4.dart';
 
 class MangoFarmDetailsPage extends StatelessWidget {
-  MangoFarmDetailsPage({super.key});
+  final String farmId; // Add farmId as a parameter
+
+  MangoFarmDetailsPage({required this.farmId, Key? key}) : super(key: key);
 
   final TextEditingController _numberOfVarietyController =
       TextEditingController();
@@ -14,16 +16,15 @@ class MangoFarmDetailsPage extends StatelessWidget {
   final TextEditingController _yieldController = TextEditingController();
 
   Future<void> _saveMangoFarmDetails(BuildContext context) async {
-    // Get the current user
     var user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Save mango farm details to Firestore under MangoFarmDetails collection
+      String subfolder = 'users/${user.uid}/$farmId/';
+
       await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('FarmerDetails3') // Change subcollection name here
-          .add({
+          .collection(subfolder)
+          .doc('FarmerDetails3')
+          .set({
         'userId': user.uid,
         'numberOfVarieties': _numberOfVarietyController.text,
         'numberOfTrees': _numberOfTreesController.text,
@@ -31,11 +32,10 @@ class MangoFarmDetailsPage extends StatelessWidget {
         'yieldInPreviousYear': _yieldController.text,
       });
 
-      // Navigate to the next page (MangoFarmDetailsPage1 or any other page)
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MangoFarmDetailsPage1(),
+          builder: (context) => MangoFarmDetailsPage1(farmId: farmId),
         ),
       );
     }
@@ -74,11 +74,13 @@ class MangoFarmDetailsPage extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Mango Varieties'),
             SizedBox(height: 10),
-            _buildTextField('Number of mango variety', TextInputType.number),
+            _buildTextField('Number of mango variety', TextInputType.number,
+                _numberOfVarietyController),
             SizedBox(height: 20),
             _buildSubHeading('Count of Mango Trees'),
             SizedBox(height: 10),
-            _buildTextField('Number of mango tree', TextInputType.number),
+            _buildTextField('Number of mango tree', TextInputType.number,
+                _numberOfTreesController),
             SizedBox(height: 20),
             _buildSubHeading('Irrigation Method'),
             SizedBox(height: 10),
@@ -89,18 +91,13 @@ class MangoFarmDetailsPage extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Yield in Previous Year'),
             SizedBox(height: 10),
-            _buildTextField(
-                'Yield of mangoes in the previous year', TextInputType.number),
+            _buildTextField('Yield of mangoes in the previous year',
+                TextInputType.number, _yieldController),
             SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  //MangoFarmDetailsPage1
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MangoFarmDetailsPage1()),
-                  );
+                  _saveMangoFarmDetails(context);
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -124,8 +121,10 @@ class MangoFarmDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      TextEditingController controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: OutlineInputBorder(),
@@ -152,7 +151,7 @@ class MangoFarmDetailsPage extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
+            _selectedIrrigationMethod = value ?? 'null';
           },
         ),
       ),

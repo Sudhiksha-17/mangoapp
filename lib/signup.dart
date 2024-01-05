@@ -1,7 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mangoapp/login.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'login.dart';
 import 'displayfarms.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -25,8 +33,14 @@ class _SignUpPageState extends State<SignUpPage> {
               password: passwordController.text.trim());
 
       // Additional actions after successful signup
-      // For example, you might navigate to the home screen
       print('User registered: ${userCredential.user?.email}');
+
+      // Save user details to Firestore with the first 5 letters of the document name as the unique ID
+      await _saveUserDetailsToFirestore(
+        userCredential.user?.uid,
+        fullNameController.text.trim(),
+        emailController.text.trim(),
+      );
 
       // Navigate to the DisplayFarms screen
       Navigator.push(
@@ -38,6 +52,25 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print('Error during email/password sign-up: $e');
       // Handle the error, for example, display an error message
+    }
+  }
+
+  Future<void> _saveUserDetailsToFirestore(
+      String? userId, String fullName, String email) async {
+    try {
+      // Extract the first 5 letters of the document name as the unique ID
+      String uniqueId = userId!.substring(0, 6);
+
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'fullName': fullName,
+        'email': email,
+        'uniqueId': uniqueId,
+        // Add other user details as needed
+      });
+
+      print('User details saved to Firestore with Unique ID: $uniqueId');
+    } catch (e) {
+      print('Error saving user details to Firestore: $e');
     }
   }
 
@@ -156,6 +189,19 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Your App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: SignUpPage(),
     );
   }
 }

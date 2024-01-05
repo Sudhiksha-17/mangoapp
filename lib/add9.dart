@@ -1,14 +1,18 @@
 import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:mangoapp/displayfarms.dart'; // Correct import
+import 'package:mangoapp/add8.dart';
+import 'package:mangoapp/displayfarms.dart';
 
 class UploadScreen extends StatelessWidget {
+  final String farmId; // Add farmId as a parameter
+
+  UploadScreen({required this.farmId, Key? key}) : super(key: key);
+
   Future<void> _uploadPhotos() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -36,14 +40,34 @@ class UploadScreen extends StatelessWidget {
   Future<void> _uploadFile(File file, String folder) async {
     await Firebase.initializeApp();
 
-    final ref = firebase_storage.FirebaseStorage.instance.ref().child(
-        '$folder/${DateTime.now().millisecondsSinceEpoch}${file.path.split('/').last}');
+    final user = FirebaseAuth.instance.currentUser;
 
-    await ref.putFile(file);
+    if (user != null) {
+      // Create subfolders for photos and videos under the user's collection in storage
+      final photoRef = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('users/${user.uid}/$farmId/$folder');
 
-    final downloadURL = await ref.getDownloadURL();
+      final ref = photoRef.child(
+          '${DateTime.now().millisecondsSinceEpoch}${file.path.split('/').last}');
 
-    print('File uploaded to: $downloadURL');
+      await ref.putFile(file);
+
+      final downloadURL = await ref.getDownloadURL();
+
+      // Save file details to Firestore under the user's collection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('uploadedFiles')
+          .add({
+        'fileType': folder,
+        'downloadURL': downloadURL,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      print('File uploaded to: $downloadURL');
+    }
   }
 
   @override
@@ -92,8 +116,10 @@ class UploadScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 // Implement submit button functionality
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => FarmsPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FarmAddedSuccessPage()));
               },
               child: Text('Submit', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
@@ -103,33 +129,6 @@ class UploadScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class SubmitPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Submit Page'),
-      ),
-      body: Center(
-        child: Text('This is the Submit Page'),
-      ),
-    );
-  }
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Upload App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: UploadScreen(),
     );
   }
 }
