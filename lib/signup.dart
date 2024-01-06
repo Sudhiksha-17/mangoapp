@@ -22,6 +22,8 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController phoneNumberController =
+      TextEditingController(); // New line
 
   Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
     try {
@@ -33,10 +35,11 @@ class _SignUpPageState extends State<SignUpPage> {
       // Additional actions after successful signup
       print('User registered: ${userCredential.user?.email}');
 
-      // Save user details to Firestore with the first 5 letters of the document name as the unique ID
+      // Save user details to Firestore
       await _saveUserDetailsToFirestore(
         userCredential.user?.uid,
         fullNameController.text.trim(),
+        phoneNumberController.text.trim(), // New line
         emailController.text.trim(),
       );
 
@@ -50,17 +53,25 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print('Error during email/password sign-up: $e');
       // Handle the error, for example, display an error message
+      String errorMessage =
+          'An error occurred during signup. Please try again.';
+      if (e is FirebaseAuthException) {
+        errorMessage = e.message ?? errorMessage;
+      }
+
+      _showErrorDialog(context, errorMessage);
     }
   }
 
   Future<void> _saveUserDetailsToFirestore(
-      String? userId, String fullName, String email) async {
+      String? userId, String fullName, String phoneNumber, String email) async {
     try {
       // Extract the first 5 letters of the document name as the unique ID
       String uniqueId = userId!.substring(0, 6);
 
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'fullName': fullName,
+        'phoneNumber': phoneNumber, // New line
         'email': email,
         'uniqueId': uniqueId,
         // Add other user details as needed
@@ -70,6 +81,56 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print('Error saving user details to Firestore: $e');
     }
+  }
+
+  Widget _buildTextFieldWithLabel(
+      String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: label,
+              hintStyle: const TextStyle(color: Colors.white70),
+              border: const OutlineInputBorder(),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+            ),
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Signup Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -115,6 +176,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   _buildTextFieldWithLabel('Full Name', fullNameController),
+                  _buildTextFieldWithLabel(
+                      'Phone Number', phoneNumberController), // New line
                   _buildTextFieldWithLabel('Email', emailController),
                   _buildTextFieldWithLabel('Password', passwordController),
                   ElevatedButton(
@@ -133,8 +196,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              LoginPage(), // Replace LoginPage with the actual login page class
+                          builder: (context) => LoginPage(),
                         ),
                       );
                     },
@@ -154,36 +216,6 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextFieldWithLabel(
-      String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: label,
-              hintStyle: const TextStyle(color: Colors.white70),
-              border: const OutlineInputBorder(),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-            ),
-            style: const TextStyle(color: Colors.white),
-          ),
-        ],
       ),
     );
   }

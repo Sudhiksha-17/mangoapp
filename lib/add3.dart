@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangoapp/add4.dart';
+import 'package:mangoapp/add5.dart';
 
-class MangoFarmDetailsPage extends StatelessWidget {
+class MangoFarmDetailsPage extends StatefulWidget {
   final String farmId; // Add farmId as a parameter
 
   MangoFarmDetailsPage({required this.farmId, Key? key}) : super(key: key);
 
+  @override
+  _MangoFarmDetailsPageState createState() => _MangoFarmDetailsPageState();
+}
+
+class _MangoFarmDetailsPageState extends State<MangoFarmDetailsPage> {
   final TextEditingController _numberOfVarietyController =
       TextEditingController();
   final TextEditingController _numberOfTreesController =
       TextEditingController();
-  String _selectedIrrigationMethod = 'null';
+  String selectedOption = '';
   final TextEditingController _yieldController = TextEditingController();
 
   Future<void> _saveMangoFarmDetails(BuildContext context) async {
     var user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      String subfolder = 'users/${user.uid}/$farmId/';
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
       await FirebaseFirestore.instance
           .collection(subfolder)
@@ -28,14 +34,14 @@ class MangoFarmDetailsPage extends StatelessWidget {
         'userId': user.uid,
         'numberOfVarieties': _numberOfVarietyController.text,
         'numberOfTrees': _numberOfTreesController.text,
-        'irrigationMethod': _selectedIrrigationMethod,
+        'irrigationMethod': selectedOption,
         'yieldInPreviousYear': _yieldController.text,
       });
 
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MangoFarmDetailsPage1(farmId: farmId),
+          builder: (context) => MangoFarmDetailsPage1(farmId: widget.farmId),
         ),
       );
     }
@@ -144,6 +150,7 @@ class MangoFarmDetailsPage extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value: selectedOption.isNotEmpty ? selectedOption : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -151,7 +158,9 @@ class MangoFarmDetailsPage extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            _selectedIrrigationMethod = value ?? 'null';
+            setState(() {
+              selectedOption = value ?? '';
+            });
           },
         ),
       ),

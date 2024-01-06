@@ -77,9 +77,13 @@ class _AddFarmsPageState extends State<AddFarmsPage> {
         final ref = FirebaseStorage.instance.ref().child(
             '$subfolder${DateTime.now().millisecondsSinceEpoch}_$fileName');
 
-        await ref.putData(file.bytes!);
+        String farmerIdSubfolder = '$subfolder/Farmer_Id/';
+        final StorageRef = FirebaseStorage.instance.ref().child(
+            '$farmerIdSubfolder${DateTime.now().millisecondsSinceEpoch}_$fileName');
 
-        final downloadURL = await ref.getDownloadURL();
+        await StorageRef.putData(file.bytes!);
+
+        final downloadURL = await StorageRef.getDownloadURL();
         fileUrls.add(downloadURL);
       }
     }

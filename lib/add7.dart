@@ -3,11 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'add6.dart';
 
-class OtherPlantsDetailsPage2 extends StatelessWidget {
+class OtherPlantsDetailsPage2 extends StatefulWidget {
   final String farmId; // Add farmId as a parameter
 
   OtherPlantsDetailsPage2({required this.farmId, Key? key}) : super(key: key);
 
+  @override
+  _OtherPlantsDetailsPage2State createState() =>
+      _OtherPlantsDetailsPage2State();
+}
+
+class _OtherPlantsDetailsPage2State extends State<OtherPlantsDetailsPage2> {
   final TextEditingController _cropNameController = TextEditingController();
   final TextEditingController _areaController = TextEditingController();
   final TextEditingController _plantCountController = TextEditingController();
@@ -19,7 +25,7 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
 
     if (user != null) {
       // Save other plants details to Firestore under FarmerDetails7 subsection
-      String subfolder = 'users/${user.uid}/$farmId/';
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
       await FirebaseFirestore.instance
           .collection(subfolder)
@@ -35,7 +41,7 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OtherPlantsDetailsPage(farmId: farmId),
+          builder: (context) => OtherPlantsDetailsPage(farmId: widget.farmId),
         ),
       );
     }
@@ -144,6 +150,9 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value: _selectedIrrigationMethod.isNotEmpty
+              ? _selectedIrrigationMethod
+              : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -151,7 +160,9 @@ class OtherPlantsDetailsPage2 extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
+            setState(() {
+              _selectedIrrigationMethod = value ?? '';
+            });
           },
         ),
       ),

@@ -4,12 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangoapp/add5.dart';
 import 'package:mangoapp/add6.dart';
 
-class MangoFarmDetailsPage1 extends StatelessWidget {
+class MangoFarmDetailsPage1 extends StatefulWidget {
   final String farmId;
 
-  MangoFarmDetailsPage1({required this.farmId, super.key});
+  MangoFarmDetailsPage1({required this.farmId, Key? key}) : super(key: key);
 
-  String _selectedMangoVariety = 'Kesar';
+  @override
+  _MangoFarmDetailsPage1State createState() => _MangoFarmDetailsPage1State();
+}
+
+class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
+  String selectedOption = '';
   late final TextEditingController _areaController = TextEditingController();
   late final TextEditingController _treeCountController =
       TextEditingController();
@@ -21,23 +26,24 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
 
     if (user != null) {
       // Use the provided farmId parameter to create the subfolder
-      String subfolder = 'users/${user.uid}/${farmId}/';
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
       // Save mango variety details to Firestore under FarmDetails4 subsection
       await FirebaseFirestore.instance
           .collection(subfolder)
           .doc('FarmerDetails4')
           .set({
-        'mangoVariety': _selectedMangoVariety,
+        'mangoVariety': selectedOption,
         'area': _areaController.text,
         'treeCount': _treeCountController.text,
         'ageOfTrees': _ageOfTreesController.text,
       });
 
+      // Navigate to MangoFarmDetailsPage2
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MangoFarmDetailsPage2(farmId: farmId),
+          builder: (context) => MangoFarmDetailsPage2(farmId: widget.farmId),
         ),
       );
     }
@@ -76,32 +82,70 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Mango Variety'),
             SizedBox(height: 10),
-            _buildDropDown(
-                'Name of the mango variety', ['Kesar', 'Alphonso', 'Malgova']),
+            _buildDropDown('Name of the mango variety', [
+              "ALPHONSO",
+              "ATHIMATHURAM",
+              "BANGANAPALLI",
+              "CHERUKURASAM",
+              "CHAUSA",
+              "DEUGAD ALPHONSO",
+              "DHASERI",
+              "HIMAM PASAND",
+              "JAHANGIR",
+              "JAWARI",
+              "KALAPADI",
+              "KESAR",
+              "KOPPUR BANGANAPALLI",
+              "KOPPUR KALAPADI",
+              "KOPPUR RUMAN",
+              "LANGRA",
+              "MALLIKA",
+              "MALGOVA",
+              "MALIHABADI DHASHERI",
+              "NEELAM",
+              "PANCHAVARNAM",
+              "PATTANI GOVA",
+              "PEDDHA RASAL",
+              "PETHER",
+              "RATHNAGIRI ALPHONSO",
+              "RUMANI",
+              "SENDHURA",
+              "SWARNAREKHA",
+              "TOTAPURI/ BANGAWRA",
+              "VADU MANGAI"
+            ]),
             SizedBox(height: 20),
             _buildSubHeading('Area of this variety'),
             SizedBox(height: 10),
-            _buildTextField('Area spent on this variety in acres',
-                TextInputType.number, _areaController),
+            _buildTextField(
+              'Area spent on this variety in acres',
+              TextInputType.number,
+            ),
             SizedBox(height: 20),
             _buildSubHeading('Count of trees in this variety'),
             SizedBox(height: 10),
-            _buildTextField('Number of trees of this variety',
-                TextInputType.number, _treeCountController),
+            _buildTextField(
+              'Number of trees of this variety',
+              TextInputType.number,
+            ),
             SizedBox(height: 20),
             _buildSubHeading('Age of trees'),
             SizedBox(height: 10),
-            _buildTextField('Period since the trees are planted(in yrs/months)',
-                TextInputType.text, _ageOfTreesController),
+            _buildTextField(
+              'Period since the trees are planted(in yrs/months)',
+              TextInputType.text,
+            ),
             SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 // Navigation logic to the next page for adding crops
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            MangoFarmDetailsPage2(farmId: farmId)));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MangoFarmDetailsPage2(farmId: widget.farmId),
+                  ),
+                );
               },
               child: Text(
                 '+ Add variety',
@@ -111,17 +155,17 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _saveMangoVarietyDetails(context);
                   // Implement continue button functionality
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MangoFarmDetailsPage2(farmId: farmId)));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          OtherPlantsDetailsPage(farmId: widget.farmId),
+                    ),
+                  );
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -145,10 +189,8 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType,
-      TextEditingController controller) {
+  Widget _buildTextField(String placeholder, TextInputType inputType) {
     return TextField(
-      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: OutlineInputBorder(),
@@ -168,6 +210,7 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value: selectedOption.isNotEmpty ? selectedOption : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -175,8 +218,9 @@ class MangoFarmDetailsPage1 extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
-            _selectedMangoVariety = value ?? 'Kesar';
+            setState(() {
+              selectedOption = value ?? '';
+            });
           },
         ),
       ),

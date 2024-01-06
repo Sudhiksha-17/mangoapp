@@ -5,11 +5,16 @@ import 'add9.dart';
 import 'add7.dart'; // Import OtherPlantsDetailsPage2 if not already done
 import 'add8.dart'; // Import FarmAddedSuccessPage if not already done
 
-class OtherPlantsDetailsPage extends StatelessWidget {
+class OtherPlantsDetailsPage extends StatefulWidget {
   final String farmId; // Add farmId as a parameter
 
   OtherPlantsDetailsPage({required this.farmId, Key? key}) : super(key: key);
 
+  @override
+  _OtherPlantsDetailsPageState createState() => _OtherPlantsDetailsPageState();
+}
+
+class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
   final TextEditingController _cropNameController = TextEditingController();
   final TextEditingController _areaUtilizedController = TextEditingController();
   final TextEditingController _countOfPlantsController =
@@ -22,7 +27,7 @@ class OtherPlantsDetailsPage extends StatelessWidget {
 
     if (user != null) {
       // Save crop details to Firestore under FarmerDetails6 subsection
-      String subfolder = 'users/${user.uid}/$farmId/';
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
       await FirebaseFirestore.instance
           .collection(subfolder)
@@ -96,7 +101,7 @@ class OtherPlantsDetailsPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            OtherPlantsDetailsPage2(farmId: farmId)));
+                            OtherPlantsDetailsPage2(farmId: widget.farmId)));
               },
               child: Text(
                 '+ Add crop',
@@ -114,7 +119,8 @@ class OtherPlantsDetailsPage extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => UploadScreen(farmId: farmId)));
+                          builder: (context) =>
+                              UploadScreen(farmId: widget.farmId)));
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -161,6 +167,9 @@ class OtherPlantsDetailsPage extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value: _selectedIrrigationMethod.isNotEmpty
+              ? _selectedIrrigationMethod
+              : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -168,7 +177,9 @@ class OtherPlantsDetailsPage extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
+            setState(() {
+              _selectedIrrigationMethod = value ?? '';
+            });
           },
         ),
       ),

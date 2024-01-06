@@ -23,7 +23,33 @@ class LoginPage extends StatelessWidget {
     } catch (e) {
       print('Error during email/password sign in: $e');
       // Handle the error, for example, display an error message
+      String errorMessage = 'An error occurred during login. Please try again.';
+      if (e is FirebaseAuthException) {
+        errorMessage = e.message ?? errorMessage;
+      }
+
+      _showErrorDialog(context, errorMessage);
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

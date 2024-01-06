@@ -4,15 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangoapp/add6.dart';
 import 'add4.dart';
 
-class MangoFarmDetailsPage2 extends StatelessWidget {
+class MangoFarmDetailsPage2 extends StatefulWidget {
   final String farmId; // Add farmId as a parameter
 
   MangoFarmDetailsPage2({required this.farmId, Key? key}) : super(key: key);
 
+  @override
+  _MangoFarmDetailsPage2State createState() => _MangoFarmDetailsPage2State();
+}
+
+class _MangoFarmDetailsPage2State extends State<MangoFarmDetailsPage2> {
   final TextEditingController _areaController = TextEditingController();
   final TextEditingController _treeCountController = TextEditingController();
   final TextEditingController _ageOfTreesController = TextEditingController();
-  String _selectedMangoVariety = 'Kesar';
+  String _selectedMangoVariety = '';
 
   Future<void> _saveMangoVarietyDetails(BuildContext context) async {
     // Get the current user
@@ -20,7 +25,7 @@ class MangoFarmDetailsPage2 extends StatelessWidget {
 
     if (user != null) {
       // Save mango variety details to Firestore under FarmerDetails5 subsection
-      String subfolder = 'users/${user.uid}/$farmId/';
+      String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
       await FirebaseFirestore.instance
           .collection(subfolder)
@@ -36,7 +41,7 @@ class MangoFarmDetailsPage2 extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OtherPlantsDetailsPage(farmId: farmId),
+          builder: (context) => OtherPlantsDetailsPage(farmId: widget.farmId),
         ),
       );
     }
@@ -75,8 +80,38 @@ class MangoFarmDetailsPage2 extends StatelessWidget {
             SizedBox(height: 20),
             _buildSubHeading('Mango Variety'),
             SizedBox(height: 10),
-            _buildDropDown(
-                'Name of the mango variety', ['Kesar', 'Alphonso', 'Malgova']),
+            _buildDropDown('Name of the mango variety', [
+              "ALPHONSO",
+              "ATHIMATHURAM",
+              "BANGANAPALLI",
+              "CHERUKURASAM",
+              "CHAUSA",
+              "DEUGAD ALPHONSO",
+              "DHASERI",
+              "HIMAM PASAND",
+              "JAHANGIR",
+              "JAWARI",
+              "KALAPADI",
+              "KESAR",
+              "KOPPUR BANGANAPALLI",
+              "KOPPUR KALAPADI",
+              "KOPPUR RUMAN",
+              "LANGRA",
+              "MALLIKA",
+              "MALGOVA",
+              "MALIHABADI DHASHERI",
+              "NEELAM",
+              "PANCHAVARNAM",
+              "PATTANI GOVA",
+              "PEDDHA RASAL",
+              "PETHER",
+              "RATHNAGIRI ALPHONSO",
+              "RUMANI",
+              "SENDHURA",
+              "SWARNAREKHA",
+              "TOTAPURI/ BANGAWRA",
+              "VADU MANGAI"
+            ]),
             SizedBox(height: 20),
             _buildSubHeading('Area of this variety'),
             SizedBox(height: 10),
@@ -143,6 +178,8 @@ class MangoFarmDetailsPage2 extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
+          value:
+              _selectedMangoVariety.isNotEmpty ? _selectedMangoVariety : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -150,8 +187,9 @@ class MangoFarmDetailsPage2 extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? value) {
-            // Handle dropdown value changes
-            _selectedMangoVariety = value ?? 'Kesar';
+            setState(() {
+              _selectedMangoVariety = value ?? '';
+            });
           },
         ),
       ),
