@@ -26,49 +26,29 @@ class DisplayPage extends StatefulWidget {
 }
 
 class _DisplayPageState extends State<DisplayPage> {
-  late TextEditingController _farmNameController;
-  late TextEditingController _phoneNumberController;
-  late TextEditingController _farmAddressController;
-  late TextEditingController _farmLandController;
-  late TextEditingController _mangoAreaController;
-  late TextEditingController _otherCropsAreaController;
-  late TextEditingController _locationDataController;
-  late TextEditingController _numberOfVarietyController;
-  late TextEditingController _numberOfTreesController;
-  late TextEditingController _yieldController;
-  late TextEditingController _selectedMangoVarietyController;
-  late TextEditingController _areaController;
-  late TextEditingController _treeCountController;
-  late TextEditingController _ageOfTreesController;
-  late TextEditingController _selectedIrrigationMethodController;
-  late TextEditingController _cropNameController;
-  late TextEditingController _areaUtilizedController;
-  late TextEditingController _countOfPlantsController;
-  late TextEditingController _selectedIrrigationMethodOtherPlantController;
+  late String _farmName = '';
+  late String _phoneNumber = '';
+  late String _farmAddress = '';
+  late String _farmLand = '';
+  late String _mangoArea = '';
+  late String _otherCropsArea = '';
+  late String _locationData = '';
+  late String _numberOfVariety = '';
+  late String _numberOfTrees = '';
+  late String _yield = '';
+  late String _selectedMangoVariety = '';
+  late String _area = '';
+  late String _treeCount = '';
+  late String _ageOfTrees = '';
+  late String _selectedIrrigationMethod = '';
+  late String _cropName = '';
+  late String _areaUtilized = '';
+  late String _countOfPlants = '';
+  late String _selectedIrrigationMethodOtherPlant = '';
 
   @override
   void initState() {
     super.initState();
-    _farmNameController = TextEditingController();
-    _phoneNumberController = TextEditingController();
-    _farmAddressController = TextEditingController();
-    _farmLandController = TextEditingController();
-    _mangoAreaController = TextEditingController();
-    _otherCropsAreaController = TextEditingController();
-    _locationDataController = TextEditingController();
-    _numberOfVarietyController = TextEditingController();
-    _numberOfTreesController = TextEditingController();
-    _yieldController = TextEditingController();
-    _selectedMangoVarietyController = TextEditingController();
-    _areaController = TextEditingController();
-    _treeCountController = TextEditingController();
-    _ageOfTreesController = TextEditingController();
-    _selectedIrrigationMethodController = TextEditingController();
-    _cropNameController = TextEditingController();
-    _areaUtilizedController = TextEditingController();
-    _countOfPlantsController = TextEditingController();
-    _selectedIrrigationMethodOtherPlantController = TextEditingController();
-
     _fetchFarmData();
   }
 
@@ -91,9 +71,11 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _farmNameController.text = data?['farmerName'] ?? '';
-        _phoneNumberController.text = data?['phoneNumber'] ?? '';
-        _farmAddressController.text = data?['farmAddress'] ?? '';
+        setState(() {
+          _farmName = data?['farmerName'] ?? '';
+          _phoneNumber = data?['phoneNumber'] ?? '';
+          _farmAddress = data?['farmAddress'] ?? '';
+        });
       } else {
         print('Farm data not found for farmId: ${widget.farmId}');
       }
@@ -105,12 +87,14 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _farmLandController.text = data?['farmLandArea'] ?? '';
-        _mangoAreaController.text = data?['mangoArea'] ?? '';
-        _otherCropsAreaController.text = data?['otherCropsArea'] ?? '';
-        //_locationDataController.text = data?['location'] != null
-        //  ? _locationDataToJson(data?['location'])
-        //: '';
+        setState(() {
+          _farmLand = data?['farmLandArea'] ?? '';
+          _mangoArea = data?['mangoArea'] ?? '';
+          _otherCropsArea = data?['otherCropsArea'] ?? '';
+          //_locationData = data?['location'] != null
+          //  ? _locationDataToJson(data?['location'])
+          //: '';
+        });
       } else {
         print('FarmerDetails2 data not found for farmId: ${widget.farmId}');
       }
@@ -122,15 +106,12 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _numberOfVarietyController.text = data?['numberOfVarieties'] ?? '';
-        _numberOfTreesController.text = data?['numberOfTrees'] ?? '';
-        _yieldController.text = data?['yieldInPreviousYear'] ?? '';
-        _selectedMangoVarietyController.text = data?['mangoVariety'] ?? '';
-        _areaController.text = data?['area'] ?? '';
-        _treeCountController.text = data?['treeCount'] ?? '';
-        _ageOfTreesController.text = data?['ageOfTrees'] ?? '';
-        _selectedIrrigationMethodController.text =
-            data?['irrigationMethod'] ?? '';
+        setState(() {
+          _numberOfVariety = data?['numberOfVarieties'] ?? '';
+          _numberOfTrees = data?['numberOfTrees'] ?? '';
+          _selectedIrrigationMethod = data?['irrigationMethod'] ?? '';
+          _yield = data?['yieldInPreviousYear'] ?? '';
+        });
       } else {
         print('FarmerDetails3 data not found for farmId: ${widget.farmId}');
       }
@@ -142,10 +123,12 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _selectedMangoVarietyController.text = data?['mangoVariety'] ?? '';
-        _areaController.text = data?['area'] ?? '';
-        _treeCountController.text = data?['treeCount'] ?? '';
-        _ageOfTreesController.text = data?['ageOfTrees'] ?? '';
+        setState(() {
+          _selectedMangoVariety = data?['mangoVariety'] ?? '';
+          _area = data?['area'] ?? '';
+          _treeCount = data?['treeCount'] ?? '';
+          _ageOfTrees = data?['ageOfTrees'] ?? '';
+        });
       } else {
         print('FarmerDetails4 data not found for farmId: ${widget.farmId}');
       }
@@ -157,10 +140,12 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _selectedMangoVarietyController.text = data?['mangoVariety'] ?? '';
-        _areaController.text = data?['area'] ?? '';
-        _treeCountController.text = data?['treeCount'] ?? '';
-        _ageOfTreesController.text = data?['ageOfTrees'] ?? '';
+        setState(() {
+          _selectedMangoVariety = data?['mangoVariety'] ?? '';
+          _area = data?['area'] ?? '';
+          _treeCount = data?['treeCount'] ?? '';
+          _ageOfTrees = data?['ageOfTrees'] ?? '';
+        });
       } else {
         print('FarmerDetails5 data not found for farmId: ${widget.farmId}');
       }
@@ -172,11 +157,12 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _cropNameController.text = data?['cropName'] ?? '';
-        _areaUtilizedController.text = data?['areaUtilized'] ?? '';
-        _countOfPlantsController.text = data?['countOfPlants'] ?? '';
-        _selectedIrrigationMethodOtherPlantController.text =
-            data?['irrigationMethod'] ?? '';
+        setState(() {
+          _cropName = data?['cropName'] ?? '';
+          _areaUtilized = data?['areaUtilized'] ?? '';
+          _countOfPlants = data?['countOfPlants'] ?? '';
+          _selectedIrrigationMethodOtherPlant = data?['irrigationMethod'] ?? '';
+        });
       } else {
         print('OtherPlantDetails1 data not found for farmId: ${widget.farmId}');
       }
@@ -188,11 +174,12 @@ class _DisplayPageState extends State<DisplayPage> {
 
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
-        _cropNameController.text = data?['cropName'] ?? '';
-        _areaController.text = data?['area'] ?? '';
-        _countOfPlantsController.text = data?['plantCount'] ?? '';
-        _selectedIrrigationMethodOtherPlantController.text =
-            data?['irrigationMethod'] ?? '';
+        setState(() {
+          _cropName = data?['cropName'] ?? '';
+          _area = data?['area'] ?? '';
+          _countOfPlants = data?['plantCount'] ?? '';
+          _selectedIrrigationMethodOtherPlant = data?['irrigationMethod'] ?? '';
+        });
       } else {
         print('OtherPlantDetails2 data not found for farmId: ${widget.farmId}');
       }
@@ -214,15 +201,10 @@ class _DisplayPageState extends State<DisplayPage> {
           children: [
             DataDisplaySection(
               heading: 'Farmer Details 1',
-              dataLables: [
-                'Farmer name',
-                'Phone number',
-                'Farm Address',
-              ],
-              controllers: [
-                _farmNameController,
-                _phoneNumberController,
-                _farmAddressController,
+              dataLabels: [
+                'Farmer name: $_farmName',
+                'Phone number: $_phoneNumber',
+                'Farm Address: $_farmAddress',
               ],
             ),
             const SizedBox(height: 10),
@@ -230,17 +212,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Farmer Details 2',
-              dataLables: [
-                'Farm Land',
-                'Area(Mangoes)',
-                'Area(Other crops)',
-                'Location',
-              ],
-              controllers: [
-                _farmLandController,
-                _mangoAreaController,
-                _otherCropsAreaController,
-                _locationDataController,
+              dataLabels: [
+                'Farm Land: $_farmLand',
+                'Area(Mangoes): $_mangoArea',
+                'Area(Other crops): $_otherCropsArea',
+                'Location: $_locationData',
               ],
             ),
             const SizedBox(height: 10),
@@ -248,25 +224,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Mango Details',
-              dataLables: [
-                'Number of Varieties',
-                'Number of Trees',
-                'Yield in Previous Year',
-                'Mango Variety',
-                'Area',
-                'Tree Count',
-                'Age of Trees',
-                'Irrigation Method',
-              ],
-              controllers: [
-                _numberOfVarietyController,
-                _numberOfTreesController,
-                _yieldController,
-                _selectedMangoVarietyController,
-                _areaController,
-                _treeCountController,
-                _ageOfTreesController,
-                _selectedIrrigationMethodController,
+              dataLabels: [
+                'Number of Varieties: $_numberOfVariety',
+                'Number of Trees: $_numberOfTrees',
+                'Irrigation Method: $_selectedIrrigationMethod',
+                'Yield in Previous Year: $_yield',
               ],
             ),
             const SizedBox(height: 10),
@@ -274,17 +236,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Mango Variety 1',
-              dataLables: [
-                'Mango Variety',
-                'Area',
-                'Tree Count',
-                'Age of Trees',
-              ],
-              controllers: [
-                _selectedMangoVarietyController,
-                _areaController,
-                _treeCountController,
-                _ageOfTreesController,
+              dataLabels: [
+                'Mango Variety: $_selectedMangoVariety',
+                'Area: $_area',
+                'Tree Count: $_treeCount',
+                'Age of Trees: $_ageOfTrees',
               ],
             ),
             const SizedBox(height: 10),
@@ -292,17 +248,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Mango Variety 2',
-              dataLables: [
-                'Mango Variety',
-                'Area',
-                'Tree Count',
-                'Age of Trees',
-              ],
-              controllers: [
-                _selectedMangoVarietyController,
-                _areaController,
-                _treeCountController,
-                _ageOfTreesController,
+              dataLabels: [
+                'Mango Variety: $_selectedMangoVariety',
+                'Area: $_area',
+                'Tree Count: $_treeCount',
+                'Age of Trees: $_ageOfTrees',
               ],
             ),
             const SizedBox(height: 10),
@@ -310,17 +260,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Other Plant Details 1',
-              dataLables: [
-                'Crop Name',
-                'Area Utilized',
-                'Count of Plants',
-                'Irrigation Method',
-              ],
-              controllers: [
-                _cropNameController,
-                _areaUtilizedController,
-                _countOfPlantsController,
-                _selectedIrrigationMethodOtherPlantController,
+              dataLabels: [
+                'Crop Name: $_cropName',
+                'Area Utilized: $_areaUtilized',
+                'Count of Plants: $_countOfPlants',
+                'Irrigation Method: $_selectedIrrigationMethodOtherPlant',
               ],
             ),
             const SizedBox(height: 10),
@@ -328,17 +272,11 @@ class _DisplayPageState extends State<DisplayPage> {
             const SizedBox(height: 10),
             DataDisplaySection(
               heading: 'Other Plant Details 2',
-              dataLables: [
-                'Crop Name',
-                'Area',
-                'Plant Count',
-                'Irrigation Method',
-              ],
-              controllers: [
-                _cropNameController,
-                _areaController,
-                _countOfPlantsController,
-                _selectedIrrigationMethodOtherPlantController,
+              dataLabels: [
+                'Crop Name: $_cropName',
+                'Area: $_area',
+                'Plant Count: $_countOfPlants',
+                'Irrigation Method: $_selectedIrrigationMethodOtherPlant',
               ],
             ),
           ],
@@ -346,43 +284,16 @@ class _DisplayPageState extends State<DisplayPage> {
       ),
     );
   }
-
-  @override
-  @override
-  void dispose() {
-    _farmNameController.dispose();
-    _phoneNumberController.dispose();
-    _farmAddressController.dispose();
-    _farmLandController.dispose();
-    _mangoAreaController.dispose();
-    _otherCropsAreaController.dispose();
-    _locationDataController.dispose();
-    _numberOfVarietyController.dispose();
-    _numberOfTreesController.dispose();
-    _yieldController.dispose();
-    _selectedMangoVarietyController.dispose();
-    _areaController.dispose();
-    _treeCountController.dispose();
-    _ageOfTreesController.dispose();
-    _selectedIrrigationMethodController.dispose();
-    _cropNameController.dispose();
-    _areaUtilizedController.dispose();
-    _countOfPlantsController.dispose();
-    _selectedIrrigationMethodOtherPlantController.dispose();
-    super.dispose();
-  }
 }
 
 class DataDisplaySection extends StatelessWidget {
   final String heading;
-  final List<String> dataLables;
-  final List<TextEditingController> controllers;
+  final List<String> dataLabels;
 
   const DataDisplaySection({
     Key? key,
     required this.heading,
-    required this.dataLables,
-    required this.controllers,
+    required this.dataLabels,
   }) : super(key: key);
 
   @override
@@ -399,16 +310,15 @@ class DataDisplaySection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Align text to the left
           children: List.generate(
-            dataLables.length,
+            dataLabels.length,
             (index) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                controller: controllers[index],
-                decoration: InputDecoration(
-                  labelText: dataLables[index],
-                  border: OutlineInputBorder(),
-                ),
+              child: Text(
+                dataLabels[index],
+                style: TextStyle(fontSize: 16),
               ),
             ),
           ),

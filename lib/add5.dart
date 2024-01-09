@@ -133,7 +133,7 @@ class _MangoFarmDetailsPage2State extends State<MangoFarmDetailsPage2> {
                 onPressed: () {
                   _saveMangoVarietyDetails(context);
                 },
-                child: Text('Continue', style: TextStyle(color: Colors.white)),
+                child: Text('Save', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   primary: Color(0xFF006227),
                 ),

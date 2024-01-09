@@ -25,10 +25,8 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
     var user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Use the provided farmId parameter to create the subfolder
       String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
-      // Save mango variety details to Firestore under FarmDetails4 subsection
       await FirebaseFirestore.instance
           .collection(subfolder)
           .doc('FarmerDetails4')
@@ -39,13 +37,11 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
         'ageOfTrees': _ageOfTreesController.text,
       });
 
-      // Navigate to MangoFarmDetailsPage2
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MangoFarmDetailsPage2(farmId: widget.farmId),
-        ),
-      );
+      // Display saved details on console
+      print('Mango Variety: $selectedOption');
+      print('Area: ${_areaController.text}');
+      print('Tree Count: ${_treeCountController.text}');
+      print('Age of Trees: ${_ageOfTreesController.text}');
     }
   }
 
@@ -120,6 +116,7 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
             _buildTextField(
               'Area spent on this variety in acres',
               TextInputType.number,
+              _areaController,
             ),
             SizedBox(height: 20),
             _buildSubHeading('Count of trees in this variety'),
@@ -127,6 +124,7 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
             _buildTextField(
               'Number of trees of this variety',
               TextInputType.number,
+              _treeCountController,
             ),
             SizedBox(height: 20),
             _buildSubHeading('Age of trees'),
@@ -134,16 +132,19 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
             _buildTextField(
               'Period since the trees are planted(in yrs/months)',
               TextInputType.text,
+              _ageOfTreesController,
             ),
             SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                // Navigation logic to the next page for adding crops
+                // Save details to Firebase when tapped
+                _saveMangoVarietyDetails(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        MangoFarmDetailsPage2(farmId: widget.farmId),
+                    builder: (context) => MangoFarmDetailsPage2(
+                        farmId: widget
+                            .farmId), // Replace YourNewPage with the actual page you want to navigate to
                   ),
                 );
               },
@@ -158,7 +159,7 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Implement continue button functionality
+                  _saveMangoVarietyDetails(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -189,8 +190,10 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
     );
   }
 
-  Widget _buildTextField(String placeholder, TextInputType inputType) {
+  Widget _buildTextField(String placeholder, TextInputType inputType,
+      TextEditingController controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: placeholder,
         border: OutlineInputBorder(),
