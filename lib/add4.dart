@@ -15,10 +15,15 @@ class MangoFarmDetailsPage1 extends StatefulWidget {
 
 class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
   String selectedOption = '';
+  String newVariety = '';
+  int varietyCount = 1; // Track the number of mango varieties
+
   late final TextEditingController _areaController = TextEditingController();
   late final TextEditingController _treeCountController =
       TextEditingController();
   late final TextEditingController _ageOfTreesController =
+      TextEditingController();
+  late final TextEditingController _newVarietyController =
       TextEditingController();
 
   Future<void> _saveMangoVarietyDetails(BuildContext context) async {
@@ -27,18 +32,46 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
     if (user != null) {
       String subfolder = 'users/${user.uid}/${widget.farmId}/';
 
+      // Check if the folder for the current mango variety exists
+      String varietyFolder = 'mangovariety$varietyCount';
+      DocumentSnapshot<Map<String, dynamic>> varietySnapshot =
+          await FirebaseFirestore.instance
+              .collection(subfolder)
+              .doc('FarmerDetails4')
+              .collection(varietyFolder)
+              .doc('details')
+              .get();
+
+      // If the folder exists, increment the varietyCount and create a new folder
+      while (varietySnapshot.exists) {
+        varietyCount++;
+        varietyFolder = 'mangovariety$varietyCount';
+        varietySnapshot = await FirebaseFirestore.instance
+            .collection(subfolder)
+            .doc('FarmerDetails4')
+            .collection(varietyFolder)
+            .doc('details')
+            .get();
+      }
+
+      String varietyToSave = selectedOption.isNotEmpty
+          ? selectedOption
+          : (newVariety.isNotEmpty ? newVariety : '');
+
       await FirebaseFirestore.instance
           .collection(subfolder)
           .doc('FarmerDetails4')
+          .collection(varietyFolder)
+          .doc('details')
           .set({
-        'mangoVariety': selectedOption,
+        'mangoVariety': varietyToSave,
         'area': _areaController.text,
         'treeCount': _treeCountController.text,
         'ageOfTrees': _ageOfTreesController.text,
       });
 
       // Display saved details on console
-      print('Mango Variety: $selectedOption');
+      print('Mango Variety: $varietyToSave');
       print('Area: ${_areaController.text}');
       print('Tree Count: ${_treeCountController.text}');
       print('Age of Trees: ${_ageOfTreesController.text}');
@@ -108,8 +141,17 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
               "SENDHURA",
               "SWARNAREKHA",
               "TOTAPURI/ BANGAWRA",
-              "VADU MANGAI"
+              "VADU MANGAI",
+              "Others", // Added "Others" option
             ]),
+            if (selectedOption == "Others") ...[
+              SizedBox(height: 10),
+              _buildTextField(
+                'Enter the name of the new mango variety',
+                TextInputType.text,
+                _newVarietyController,
+              ),
+            ],
             SizedBox(height: 20),
             _buildSubHeading('Area of this variety'),
             SizedBox(height: 10),
@@ -138,6 +180,7 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
             GestureDetector(
               onTap: () {
                 // Save details to Firebase when tapped
+                newVariety = _newVarietyController.text;
                 _saveMangoVarietyDetails(context);
                 Navigator.push(
                   context,
@@ -160,6 +203,8 @@ class _MangoFarmDetailsPage1State extends State<MangoFarmDetailsPage1> {
               child: ElevatedButton(
                 onPressed: () {
                   _saveMangoVarietyDetails(context);
+                  newVariety = _newVarietyController.text;
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

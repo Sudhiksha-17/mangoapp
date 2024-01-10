@@ -37,14 +37,22 @@ class _DisplayPageState extends State<DisplayPage> {
   late String _numberOfTrees = '';
   late String _yield = '';
   late String _selectedMangoVariety = '';
+  late String _selectedMangoVariety2 = '';
   late String _area = '';
+  late String _area2 = '';
   late String _treeCount = '';
+  late String _treeCount2 = '';
   late String _ageOfTrees = '';
+  late String _ageOfTrees2 = '';
   late String _selectedIrrigationMethod = '';
   late String _cropName = '';
   late String _areaUtilized = '';
   late String _countOfPlants = '';
   late String _selectedIrrigationMethodOtherPlant = '';
+  late String _cropName2 = '';
+  late String _areaUtilized2 = '';
+  late String _countOfPlants2 = '';
+  late String _selectedIrrigationMethodOtherPlant2 = '';
 
   @override
   void initState() {
@@ -119,6 +127,8 @@ class _DisplayPageState extends State<DisplayPage> {
       documentSnapshot = await FirebaseFirestore.instance
           .collection(subfolder)
           .doc('FarmerDetails4')
+          .collection("mangovareity1")
+          .doc("details")
           .get();
 
       if (documentSnapshot.exists) {
@@ -141,10 +151,10 @@ class _DisplayPageState extends State<DisplayPage> {
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
         setState(() {
-          _selectedMangoVariety = data?['mangoVariety'] ?? '';
-          _area = data?['area'] ?? '';
-          _treeCount = data?['treeCount'] ?? '';
-          _ageOfTrees = data?['ageOfTrees'] ?? '';
+          _selectedMangoVariety2 = data?['mangoVariety'] ?? '';
+          _area2 = data?['area'] ?? '';
+          _treeCount2 = data?['treeCount'] ?? '';
+          _ageOfTrees2 = data?['ageOfTrees'] ?? '';
         });
       } else {
         print('FarmerDetails5 data not found for farmId: ${widget.farmId}');
@@ -175,10 +185,11 @@ class _DisplayPageState extends State<DisplayPage> {
       if (documentSnapshot.exists) {
         var data = documentSnapshot.data();
         setState(() {
-          _cropName = data?['cropName'] ?? '';
-          _area = data?['area'] ?? '';
-          _countOfPlants = data?['plantCount'] ?? '';
-          _selectedIrrigationMethodOtherPlant = data?['irrigationMethod'] ?? '';
+          _cropName2 = data?['cropName'] ?? '';
+          _areaUtilized2 = data?['area'] ?? '';
+          _countOfPlants2 = data?['plantCount'] ?? '';
+          _selectedIrrigationMethodOtherPlant2 =
+              data?['irrigationMethod'] ?? '';
         });
       } else {
         print('OtherPlantDetails2 data not found for farmId: ${widget.farmId}');
@@ -192,6 +203,14 @@ class _DisplayPageState extends State<DisplayPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xffffc900),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff054500),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text('Farm Details'),
       ),
       body: SingleChildScrollView(
@@ -199,85 +218,164 @@ class _DisplayPageState extends State<DisplayPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DataDisplaySection(
-              heading: 'Farmer Details 1',
-              dataLabels: [
-                'Farmer name: $_farmName',
-                'Phone number: $_phoneNumber',
-                'Farm Address: $_farmAddress',
-              ],
+            Visibility(
+              visible: _farmName.isNotEmpty ||
+                  _phoneNumber.isNotEmpty ||
+                  _farmAddress.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Farmer Details 1',
+                    dataLabels: [
+                      'Farmer name: $_farmName',
+                      'Phone number: $_phoneNumber',
+                      'Farm Address: $_farmAddress',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Farmer Details 2',
-              dataLabels: [
-                'Farm Land: $_farmLand',
-                'Area(Mangoes): $_mangoArea',
-                'Area(Other crops): $_otherCropsArea',
-                'Location: $_locationData',
-              ],
+            Visibility(
+              visible: _farmLand.isNotEmpty ||
+                  _mangoArea.isNotEmpty ||
+                  _otherCropsArea.isNotEmpty ||
+                  _locationData.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Farmer Details 2',
+                    dataLabels: [
+                      'Farm Land: $_farmLand',
+                      'Area(Mangoes): $_mangoArea',
+                      'Area(Other crops): $_otherCropsArea',
+                      'Location: $_locationData',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Mango Details',
-              dataLabels: [
-                'Number of Varieties: $_numberOfVariety',
-                'Number of Trees: $_numberOfTrees',
-                'Irrigation Method: $_selectedIrrigationMethod',
-                'Yield in Previous Year: $_yield',
-              ],
+            Visibility(
+              visible: _numberOfVariety.isNotEmpty ||
+                  _numberOfTrees.isNotEmpty ||
+                  _selectedIrrigationMethod.isNotEmpty ||
+                  _yield.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Mango Details',
+                    dataLabels: [
+                      'Number of Varieties: $_numberOfVariety',
+                      'Number of Trees: $_numberOfTrees',
+                      'Irrigation Method: $_selectedIrrigationMethod',
+                      'Yield in Previous Year: $_yield',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Mango Variety 1',
-              dataLabels: [
-                'Mango Variety: $_selectedMangoVariety',
-                'Area: $_area',
-                'Tree Count: $_treeCount',
-                'Age of Trees: $_ageOfTrees',
-              ],
+            Visibility(
+              visible: _selectedMangoVariety.isNotEmpty ||
+                  _area.isNotEmpty ||
+                  _treeCount.isNotEmpty ||
+                  _ageOfTrees.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Mango Variety 1',
+                    dataLabels: [
+                      'Mango Variety: $_selectedMangoVariety',
+                      'Area: $_area',
+                      'Tree Count: $_treeCount',
+                      'Age of Trees: $_ageOfTrees',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Mango Variety 2',
-              dataLabels: [
-                'Mango Variety: $_selectedMangoVariety',
-                'Area: $_area',
-                'Tree Count: $_treeCount',
-                'Age of Trees: $_ageOfTrees',
-              ],
+            Visibility(
+              visible: _selectedMangoVariety2.isNotEmpty ||
+                  _area2.isNotEmpty ||
+                  _treeCount2.isNotEmpty ||
+                  _ageOfTrees2.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Mango Variety 2',
+                    dataLabels: [
+                      'Mango Variety: $_selectedMangoVariety2',
+                      'Area: $_area2',
+                      'Tree Count: $_treeCount2',
+                      'Age of Trees: $_ageOfTrees2',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Other Plant Details 1',
-              dataLabels: [
-                'Crop Name: $_cropName',
-                'Area Utilized: $_areaUtilized',
-                'Count of Plants: $_countOfPlants',
-                'Irrigation Method: $_selectedIrrigationMethodOtherPlant',
-              ],
+            Visibility(
+              visible: _cropName.isNotEmpty ||
+                  _areaUtilized.isNotEmpty ||
+                  _countOfPlants.isNotEmpty ||
+                  _selectedIrrigationMethodOtherPlant.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Other Plant Details 1',
+                    dataLabels: [
+                      'Crop Name: $_cropName',
+                      'Area Utilized: $_areaUtilized',
+                      'Count of Plants: $_countOfPlants',
+                      'Irrigation Method: $_selectedIrrigationMethodOtherPlant',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Colors.black), // Horizontal line
-            const SizedBox(height: 10),
-            DataDisplaySection(
-              heading: 'Other Plant Details 2',
-              dataLabels: [
-                'Crop Name: $_cropName',
-                'Area: $_area',
-                'Plant Count: $_countOfPlants',
-                'Irrigation Method: $_selectedIrrigationMethodOtherPlant',
-              ],
+            Visibility(
+              visible: _cropName2.isNotEmpty ||
+                  _areaUtilized2.isNotEmpty ||
+                  _countOfPlants2.isNotEmpty ||
+                  _selectedIrrigationMethodOtherPlant2.isNotEmpty,
+              child: Column(
+                children: [
+                  DataDisplaySection(
+                    heading: 'Other Plant Details 2',
+                    dataLabels: [
+                      'Crop Name: $_cropName2',
+                      'Area Utilized: $_areaUtilized2',
+                      'Plant Count: $_countOfPlants2',
+                      'Irrigation Method: $_selectedIrrigationMethodOtherPlant2',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      height: 1, color: Colors.black), // Horizontal line
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
           ],
         ),
@@ -298,32 +396,34 @@ class DataDisplaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          heading,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            heading,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Align text to the left
-          children: List.generate(
-            dataLabels.length,
-            (index) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                dataLabels[index],
-                style: TextStyle(fontSize: 16),
+          const SizedBox(height: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(
+              dataLabels.length,
+              (index) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  dataLabels[index],
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

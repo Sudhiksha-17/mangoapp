@@ -68,7 +68,6 @@ class _FarmsPageState extends State<FarmsPage> {
       farmCount = int.parse(farmIds.last.split('_')[1]) + 1;
     }
 
-    // Use String interpolation to ensure correct padding
     String farmId =
         '${userId.substring(0, 6)}_${farmCount.toString().padLeft(3, '0')}';
 
@@ -137,6 +136,23 @@ class _FarmsPageState extends State<FarmsPage> {
     }
   }
 
+  void _removeFarmBox(String farmId) {
+    setState(() {
+      farmIds.removeWhere((id) => id == farmId);
+    });
+    _saveFarmIds(); // Save the updated farmIds to Firestore after deletion
+  }
+
+  // void _editFarmBox(String farmId) {
+  //   // Navigate to EditFarmPage with the selected farmId
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => AddFarmsPage(farmId: farmId),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -192,11 +208,28 @@ class _FarmsPageState extends State<FarmsPage> {
       margin: EdgeInsets.all(8.0),
       color: Color(0xff218f00),
       child: ListTile(
-        title: ElevatedButton(
-          onPressed: () {
-            _navigateToFarmPage(farmId);
-          },
-          child: Text('Farm ID: $farmId'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _navigateToFarmPage(farmId);
+              },
+              child: Text('Farm ID: $farmId'),
+            ),
+            // IconButton(
+            //   icon: Icon(Icons.edit),
+            //   onPressed: () {
+            //     _editFarmBox(farmId);
+            //   },
+            // ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                _removeFarmBox(farmId);
+              },
+            ),
+          ],
         ),
       ),
     );

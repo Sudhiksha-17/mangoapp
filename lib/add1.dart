@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mangoapp/add2.dart';
 import 'package:mangoapp/displayfarms.dart';
 import 'package:uuid/uuid.dart';
-import 'add3.dart';
+import 'add2.dart';
 
 class AddFarmsPage extends StatefulWidget {
   final String farmId;

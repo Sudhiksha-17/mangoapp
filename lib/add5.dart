@@ -18,6 +18,7 @@ class _MangoFarmDetailsPage2State extends State<MangoFarmDetailsPage2> {
   final TextEditingController _treeCountController = TextEditingController();
   final TextEditingController _ageOfTreesController = TextEditingController();
   String _selectedMangoVariety = '';
+  bool _showNewVarietyTextField = false; // Added this variable
 
   Future<void> _saveMangoVarietyDetails(BuildContext context) async {
     // Get the current user
@@ -41,7 +42,7 @@ class _MangoFarmDetailsPage2State extends State<MangoFarmDetailsPage2> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OtherPlantsDetailsPage(farmId: widget.farmId),
+          builder: (context) => MangoFarmDetailsPage1(farmId: widget.farmId),
         ),
       );
     }
@@ -110,8 +111,17 @@ class _MangoFarmDetailsPage2State extends State<MangoFarmDetailsPage2> {
               "SENDHURA",
               "SWARNAREKHA",
               "TOTAPURI/ BANGAWRA",
-              "VADU MANGAI"
+              "VADU MANGAI",
+              "Others", // Added "Others" option
             ]),
+            if (_selectedMangoVariety == "Others") ...[
+              SizedBox(height: 10),
+              _buildTextField(
+                'Enter the name of the new mango variety',
+                TextInputType.text,
+                _ageOfTreesController,
+              ),
+            ],
             SizedBox(height: 20),
             _buildSubHeading('Area of this variety'),
             SizedBox(height: 10),

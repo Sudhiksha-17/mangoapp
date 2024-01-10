@@ -5,16 +5,11 @@ import 'add9.dart';
 import 'add7.dart'; // Import OtherPlantsDetailsPage2 if not already done
 import 'add8.dart'; // Import FarmAddedSuccessPage if not already done
 
-class OtherPlantsDetailsPage extends StatefulWidget {
+class OtherPlantsDetailsPage extends StatelessWidget {
   final String farmId; // Add farmId as a parameter
 
   OtherPlantsDetailsPage({required this.farmId, Key? key}) : super(key: key);
 
-  @override
-  _OtherPlantsDetailsPageState createState() => _OtherPlantsDetailsPageState();
-}
-
-class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
   final TextEditingController _cropNameController = TextEditingController();
   final TextEditingController _areaUtilizedController = TextEditingController();
   final TextEditingController _countOfPlantsController =
@@ -27,7 +22,7 @@ class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
 
     if (user != null) {
       // Save crop details to Firestore under FarmerDetails6 subsection
-      String subfolder = 'users/${user.uid}/${widget.farmId}/';
+      String subfolder = 'users/${user.uid}/$farmId/';
 
       await FirebaseFirestore.instance
           .collection(subfolder)
@@ -101,7 +96,7 @@ class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            OtherPlantsDetailsPage2(farmId: widget.farmId)));
+                            OtherPlantsDetailsPage2(farmId: farmId)));
               },
               child: Text(
                 '+ Add crop',
@@ -119,8 +114,7 @@ class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              UploadScreen(farmId: widget.farmId)));
+                          builder: (context) => UploadScreen(farmId: farmId)));
                 },
                 child: Text('Continue', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
@@ -167,9 +161,6 @@ class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
         child: DropdownButton<String>(
           isExpanded: true,
           hint: Text(placeholder),
-          value: _selectedIrrigationMethod.isNotEmpty
-              ? _selectedIrrigationMethod
-              : null,
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -177,9 +168,7 @@ class _OtherPlantsDetailsPageState extends State<OtherPlantsDetailsPage> {
             );
           }).toList(),
           onChanged: (String? value) {
-            setState(() {
-              _selectedIrrigationMethod = value ?? '';
-            });
+            // Handle dropdown value changes
           },
         ),
       ),
